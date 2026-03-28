@@ -1,5 +1,5 @@
 import { workspaceRepository } from "./workspace.repository"
-import { updateWorkspaceDTO } from "./workspace.types";
+import { addWorkspaceMemberDTO, updateWorkspaceDTO } from "./workspace.types";
 
 export const workspaceService = {
     async getWorkspaceById(id: string) {
@@ -14,7 +14,7 @@ export const workspaceService = {
     async updateWorkspace(id:string , data : any){
         return workspaceRepository.updateWorkspace(id,data);
     },
-    async addWorkspaceMember(data : any){
+    async addWorkspaceMember(data : addWorkspaceMemberDTO){
         return workspaceRepository.addWorkspaceMember(data);
     },
     async updateWorkspaceMemeber(id:string , dto:updateWorkspaceDTO){
@@ -23,4 +23,11 @@ export const workspaceService = {
     async checkActiveUserAndGetWorkspaceById(id:string,userId  :string){
         return workspaceRepository.getWorkspaceByIdForActiveMember(id,userId);
     },
+    async getAllWorkspaces(){
+        return workspaceRepository.getWorkspace({});
+    },
+    async getAllWokspaceWhereMemberIsActive(userId:string){
+        return workspaceRepository.getAllWokspaceWhereMemberIsActive(userId);
+    }
+
 }

@@ -3,7 +3,7 @@ import { authMiddleware } from "../../middlewares/auth.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
 import { Role } from "@prisma/client";
 import { validate } from "../../middlewares/zod.validator.middleware";
-import { createWorkspaceSchema, updateWorkspaceSchema,  workspaceIdParamsSchema } from "../../validators/workspace.validator";
+import { addWorkspaceMemberSchema, createWorkspaceSchema, updateWorkspaceMemberSchema, updateWorkspaceSchema, workspaceIdParamsSchema } from "../../validators/workspace.validator";
 import { asyncHandler } from "../../utils/async.handler";
 import { workspaceController } from "./workspace.controller";
 
@@ -15,14 +15,22 @@ router.use(authMiddleware);
 //get Workspace by ID
 router.get(
     "/:workspaceId",
-    validate({params:workspaceIdParamsSchema}),
+    validate({ params: workspaceIdParamsSchema }),
     asyncHandler(workspaceController.getWorkspaceById)
 )
 // get workspace by filter
+router.get(
+    "/byFilter",
+    authorize(Role.ADMIN),
+    validate({ body: updateWorkspaceSchema }),
+    asyncHandler(workspaceController.getAllWorkspacesWithFilter)
+);
 
-//get all workspace ADMIN for specific project
-
-// get all workspace where user is active
+//get all workspace 
+router.get(
+    "/all",
+    asyncHandler(workspaceController.getAllWorkspaces)
+);
 
 // Create Workspace
 router.post(
@@ -45,8 +53,21 @@ router.patch(
 
 )
 // add Workspace member
+router.post(
+    "/member",
+    authorize(Role.ADMIN),
+    validate({body:addWorkspaceMemberSchema}),
+    asyncHandler(workspaceController.addWorkspaceMember)
 
+)
 // update Workspace member
-
+router.patch(
+    "/member/:workspaceMemberId",
+    authorize(Role.ADMIN),
+    validate({
+        params : workspaceIdParamsSchema, // since bot are uuid we can use schema
+        body :updateWorkspaceMemberSchema
+    })
+)
 
 export default router;

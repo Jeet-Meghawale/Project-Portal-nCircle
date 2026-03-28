@@ -20,45 +20,45 @@ export const workspaceRepository = {
             return workspace;
         });
     },
-    updateWorkspace(id: string, data: any) {
+    async updateWorkspace(id: string, data: any) {
         return prisma.workspace.update({
             where: { id },
             data
         })
     },
-    getWorkspace(filter: any) {
+    async getWorkspace(filter: any) {
         return prisma.workspace.findMany({
             where: filter
         }
         )
     },
-    getWorkspaceById(id: string) {
+    async getWorkspaceById(id: string) {
         return prisma.workspace.findUnique({
             where: { id }
         });
     },
-    addWorkspaceMember(data: any) {
+    async addWorkspaceMember(data: any) {
         return prisma.workspaceMember.create({
             data
         })
     },
-    updateWorkspaceMember(id: string, data: any) {
-        return prisma.workspace.update({
+    async updateWorkspaceMember(id: string, data: any) {
+        return prisma.workspaceMember.update({
             where: { id },
             data
         })
     },
-    getWorkspaceMemberByFilter(filter: any) {
+    async getWorkspaceMemberByFilter(filter: any) {
         return prisma.workspaceMember.findMany({
             where: filter
         })
     },
-    getWorkspaceMemberById(id: string) {
+    async getWorkspaceMemberById(id: string) {
         return prisma.workspaceMember.findUnique({
             where: { id }
         })
     },
-    getAllWokspaceWhereMemberIsActive(userId: string) {
+    async getAllWokspaceWhereMemberIsActive(userId: string) {
         return prisma.workspace.findMany({
             where: {
                 isActive: true, // workspace active
@@ -75,7 +75,7 @@ export const workspaceRepository = {
             }
         });
     },
-    getWorkspaceByIdForActiveMember(id: string, userId: string) {
+    async getWorkspaceByIdForActiveMember(id: string, userId: string) {
         return prisma.workspace.findUnique({
             where: {
                 id,
@@ -89,5 +89,5 @@ export const workspaceRepository = {
             }
         });
     },
-
+    
 }

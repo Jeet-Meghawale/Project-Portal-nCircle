@@ -16,7 +16,7 @@ export const createWorkspaceSchema = z.object({
 export const updateWorkspaceSchema = z.object({
     groupId: z.string().uuid(),
     projectId: z.string().uuid(),
-    role: z.nativeEnum(WorkspaceRole)
+    isActive : z.boolean(),
 }).partial();
 
 export const addWorkspaceMemberSchema = z.object({

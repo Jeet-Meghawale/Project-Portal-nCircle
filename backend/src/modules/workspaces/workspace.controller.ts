@@ -3,8 +3,6 @@ import { sendResponse } from "../../utils/send.response";
 import { workspaceService } from "./workspace.service";
 import { createWorkspaceDTO } from "./workspace.types";
 import { Role } from "@prisma/client";
-import { workspaceRepository } from "./workspace.repository";
-
 
 export const workspaceController = {
     async createWorkspace(req: Request, res: Response) {
@@ -37,4 +35,45 @@ export const workspaceController = {
         };
         sendResponse(res ,200 , result , "");
     },
+    async  getAllWorkspaces(req: Request, res: Response){
+        const role = req.role;
+        const userId = req.userId as string;
+        let result;
+        if(role=== Role.ADMIN) {
+            result = await workspaceService.getAllWorkspaces();
+        }
+        else{
+            result = await workspaceService.getAllWokspaceWhereMemberIsActive(userId);
+        }
+        
+        sendResponse(res, 200 , result);
+    },
+    async  getAllWorkspacesWithFilter(req: Request, res: Response){
+        const role = req.role;
+        const userId = req.userId as string;
+        const filter = req.body;
+        let result;
+        if(role=== Role.ADMIN) {
+            result = await workspaceService.getWorkspaceByFilter(filter);
+        }
+        else{
+            sendResponse(res, 403 , {},"Only Admin can serch using filter")
+        }
+        
+        sendResponse(res, 200 , result);
+    },
+    async  addWorkspaceMember(req: Request, res: Response){
+        const data = req.body;
+        const result  = await workspaceService.addWorkspaceMember(data);
+
+        sendResponse(res,200,result, "New Member added");
+    },
+    async  updateWorkspaceMember(req: Request, res: Response){
+        const data = req.body;
+        const workspaceMemberId = req.params.workspaceMemberId as string;
+        const result  = await workspaceService.updateWorkspaceMemeber(workspaceMemberId,data);
+
+        sendResponse(res,200,result, "Member updated");
+    },
+    
 }
