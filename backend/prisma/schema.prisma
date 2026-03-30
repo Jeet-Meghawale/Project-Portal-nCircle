@@ -86,6 +86,10 @@ model User {
 
   workspaceMemberships WorkspaceMember[]
 
+  communications Communication[]
+
+  threads Thread[]
+
   @@index([role])
 }
 
@@ -125,6 +129,7 @@ model Project {
   applications ProjectApplication[]
   groups       Group[]
   workspcae    Workspace[]
+
   @@index([createdBy])
 }
 
@@ -138,10 +143,10 @@ model ProjectApplication {
   leader   User   @relation("ApplicationLeader", fields: [leaderId], references: [id])
 
   coordinatorId String
-  coordinator User @relation("ApplicationCoordinator",fields: [coordinatorId],references: [id])
+  coordinator   User   @relation("ApplicationCoordinator", fields: [coordinatorId], references: [id])
 
-  status ApplicationStatus @default(PENDING_COORDINATOR)
-  isApproved Boolean @default(false)
+  status     ApplicationStatus @default(PENDING_COORDINATOR)
+  isApproved Boolean           @default(false)
 
   approvedById String?
   approvedBy   User?   @relation("ApplicationApprover", fields: [approvedById], references: [id])
@@ -218,32 +223,32 @@ model GroupMember {
 model Workspace {
   id String @id @default(uuid())
 
-  projectId String 
-  project   Project  @relation(fields: [projectId], references: [id])
-
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
 
   groupId String @unique
   group   Group  @relation(fields: [groupId], references: [id])
 
-  isActive Boolean @default(true)
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
   members WorkspaceMember[]
   reviews Review[]
+  threads Thread[]
 }
 
 model WorkspaceMember {
   id String @id @default(uuid())
 
-  workspaceId String 
+  workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  role WorkspaceRole
-  isActive Boolean @default(true)
-  joinedAt DateTime @default(now())
+  role     WorkspaceRole
+  isActive Boolean       @default(true)
+  joinedAt DateTime      @default(now())
 
   @@unique([workspaceId, userId])
   @@index([userId])
@@ -253,11 +258,52 @@ model Review {
   id String @id @default(uuid())
 
   workspaceId String
-  workspace Workspace @relation(fields: [workspaceId] , references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
 
-  title String 
+  title       String
   description String?
 
   progress Int @default(0)
+}
 
+model Thread {
+  id String @id @default(uuid())
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  title       String
+  description String?
+
+  createdBy String
+  user      User   @relation(fields: [createdBy], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  communications Communication[]
+  files          File[]
+}
+
+model Communication {
+  id String @id @default(uuid())
+
+  threadId String
+  thread   Thread @relation(fields: [threadId], references: [id])
+
+  createdBy String
+  user      User   @relation(fields: [createdBy], references: [id])
+
+  message String
+}
+
+model File {
+  id String @id @default(uuid())
+
+  name String
+  path String
+  type String?
+
+  threadId String
+  thread   Thread @relation(fields: [threadId], references: [id]) 
 }
