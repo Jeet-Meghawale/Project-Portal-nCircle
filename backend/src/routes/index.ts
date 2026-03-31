@@ -7,7 +7,7 @@ import workspaceRoutes from "../modules/workspaces/workspace.routes"
 import reviewsRoutes from "../modules/reviews/reviews.routes"
 import threadsRoutes from "../modules/threads/threads.routes"
 import communicationRoutes from "../modules/communication/communication.routes"
-
+import fileRoutes from "../modules/files/files.routes"
 const router = Router();
 
 router.use("/auth", authRoutes);
@@ -18,5 +18,6 @@ router.use ("/workspace",workspaceRoutes)
 router.use("/reviews", reviewsRoutes)
 router.use("/threads",threadsRoutes)
 router.use("/communication",communicationRoutes)
+router.use("/files",fileRoutes)
 
 export default router;

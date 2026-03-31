@@ -6,6 +6,8 @@ import { Role } from "@prisma/client"
 import { ApiError } from "../../utils/api.error"
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwt.util"
 import { verify } from "node:crypto"
+import { get } from "node:http"
+import { register } from "node:module"
 
 
 export const authService = {
@@ -149,6 +151,27 @@ export const authService = {
       throw new ApiError(404, "Refresh token not found");
     }
 
-    await authRepository.revokeRefreshToken(userId);
-  }
+    return authRepository.revokeRefreshToken(userId);
+  },
+
+  getAllUsers() {
+    return authRepository.getAllUsersbyFilter({});
+  },
+  getUsersByFilter(filter: any) {
+    return authRepository.getAllUsersbyFilter(filter); 
+  },
+  async registerBulk(users: RegisterInput[]) {
+    const validUsers = users.map(user => registerSchema.parse(user));
+    const usersData = await Promise.all(validUsers.map(async user => {
+      const hashedPassword = await hashPassword(user.password);
+      return {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        password: hashedPassword as string,
+        role: user.role ?? Role.STUDENT,
+      };
+    }));
+    return authRepository.registerBulk(usersData);
+  },
 }

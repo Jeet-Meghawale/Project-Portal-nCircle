@@ -1,6 +1,8 @@
 import { prisma } from "../../database/client"
 import { RegisterUserInput } from "./auth.types"
 import { RegisterInput } from "../../validators/auth.validator"
+import { register } from "node:module"
+import { Prisma } from "@prisma/client"
 
 
 export const authRepository = {
@@ -70,6 +72,16 @@ export const authRepository = {
   async findUserById(userId: string) {
     return prisma.user.findUnique({
       where: { id: userId }
+    });
+  },
+  getAllUsersbyFilter(filter: any) {
+    return prisma.user.findMany({
+      where: filter
+    });
+  },
+  registerBulk(users: Prisma.UserCreateManyInput[]) {
+    return prisma.user.createMany({
+      data: users
     });
   },
 }

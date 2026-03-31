@@ -41,7 +41,26 @@ router.post(
   asyncHandler(authController.logoutController)
 );
 
+// get all users
+router.get(
+  "/users",
+  authMiddleware,
+  authorize(Role.ADMIN),
+  asyncHandler(authController.getAllUsers)
+);
+
+// get users by filter
+router.get(
+  "/users/filter",
+  authMiddleware,
+  authorize(Role.ADMIN),
+  asyncHandler(authController.getUsersByFilter)
+);
 //Register bulk
-
-
+router.post(
+  "/register/bulk",
+  authMiddleware,
+  authorize(Role.ADMIN),
+  asyncHandler(authController.registerBulk)
+)
 export default router;

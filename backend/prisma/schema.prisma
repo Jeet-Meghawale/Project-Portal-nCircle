@@ -92,6 +92,8 @@ model User {
 
   workspaceCommunications WorkspaceCommunication[]
 
+  files File[]
+
   @@index([role])
 }
 
@@ -327,4 +329,7 @@ model File {
 
   threadId String
   thread   Thread @relation(fields: [threadId], references: [id]) 
+
+  uploadedBy String
+  user       User   @relation(fields: [uploadedBy], references: [id])
 }

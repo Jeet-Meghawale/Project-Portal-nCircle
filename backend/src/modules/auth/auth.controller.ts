@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { authService } from "./auth.service";
+import { sendResponse } from "../../utils/send.response";
 
 export const authController = {
     async registerController(req: Request, res: Response) {
@@ -71,5 +72,21 @@ export const authController = {
             success: true,
             message: "Logged out successfully"
         });
+    },
+    async getAllUsers(req: Request, res: Response) {
+        const users = await authService.getAllUsers();
+
+        sendResponse(res, 200,users, "Users fetched successfully");
+    },
+    async getUsersByFilter(req: Request, res: Response) {
+        const filter = req.query;
+        const users = await authService.getUsersByFilter(filter);
+
+        sendResponse(res, 200, users, "Users fetched successfully");
+    },
+    async registerBulk(req: Request, res: Response) {
+        const users = req.body;
+        await authService.registerBulk(users);
+        sendResponse(res, 201, null, "Users registered successfully");
     }
 }

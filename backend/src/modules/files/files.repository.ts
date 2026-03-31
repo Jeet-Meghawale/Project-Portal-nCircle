@@ -1,0 +1,17 @@
+import { prisma } from "../../database/client";
+import { Prisma } from "@prisma/client";
+
+export const FilesRepository = {
+    createFile(data : Prisma.FileCreateInput) {
+        return prisma.file.create({
+            data
+        });
+    },
+    deleteFile(id : string) {
+        return prisma.file.delete({
+            where: {
+                id
+            }
+        });
+    },
+};
