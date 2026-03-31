@@ -90,6 +90,8 @@ model User {
 
   threads Thread[]
 
+  workspaceCommunications WorkspaceCommunication[]
+
   @@index([role])
 }
 
@@ -235,6 +237,7 @@ model Workspace {
   members WorkspaceMember[]
   reviews Review[]
   threads Thread[]
+  communications WorkspaceCommunication[]
 }
 
 model WorkspaceMember {
@@ -295,6 +298,24 @@ model Communication {
   user      User   @relation(fields: [createdBy], references: [id])
 
   message String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WorkspaceCommunication {
+  id String @id @default(uuid())
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  createdBy String
+  user      User   @relation(fields: [createdBy], references: [id])
+
+  message String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model File {

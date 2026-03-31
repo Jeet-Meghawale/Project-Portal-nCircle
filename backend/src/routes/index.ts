@@ -6,7 +6,7 @@ import groupRoutes from"../modules/groups/group.routes"
 import workspaceRoutes from "../modules/workspaces/workspace.routes"
 import reviewsRoutes from "../modules/reviews/reviews.routes"
 import threadsRoutes from "../modules/threads/threads.routes"
-
+import communicationRoutes from "../modules/communication/communication.routes"
 
 const router = Router();
 
@@ -17,5 +17,6 @@ router.use("/group",groupRoutes)
 router.use ("/workspace",workspaceRoutes)
 router.use("/reviews", reviewsRoutes)
 router.use("/threads",threadsRoutes)
+router.use("/communication",communicationRoutes)
 
 export default router;
