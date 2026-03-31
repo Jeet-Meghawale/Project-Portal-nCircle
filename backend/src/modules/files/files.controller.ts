@@ -1,0 +1,27 @@
+import {Request, Response} from 'express';
+import { sendResponse } from '../../utils/send.response';
+import { filesService } from './files.services';
+
+
+export const FilesController = {
+    async uploadFile(req: Request, res: Response) {
+        const file = req.file;
+        const threadId = req.params.threadId as string; 
+        const userId = req.userId as string;
+        const data = {
+            threadId,
+            uploadedBy: userId
+        };
+        if (file===undefined || file===null) {
+           sendResponse(res, 400, {}, "No file uploaded");  
+           return;  
+        };
+        const result = await filesService.uploadFile(file, data );
+        sendResponse(res, 200, result, "File uploaded successfully");
+    },
+    async deleteFile(req: Request, res: Response) {
+        const fileId = req.params.fileId as string;
+        await filesService.deleteFile(fileId);
+        sendResponse(res, 200, {}, "File deleted successfully");
+    }
+};
