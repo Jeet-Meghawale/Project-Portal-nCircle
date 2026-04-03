@@ -3,9 +3,9 @@ import { z } from "zod"
 import { groupIdParamsSchema } from "../../validators/group.validator"
 
 export interface createGroupDTO{
-  projectId :String,
-  applicationId :String,
-  coordinatorId :String,
+  projectId :string,
+  applicationId :string,
+  coordinatorId :string,
   members: {
       userId: string
       role: MemberRole
@@ -13,9 +13,14 @@ export interface createGroupDTO{
 }
 
 export interface updateGroupDTO{
-  projectId? :String,
-  applicationId? :String,
-  coordinatorId? :String
+  projectId? :string,
+  applicationId? :string,
+  coordinatorId? :string
+}
+export interface createGroupDTONoMembers{
+  projectId :string,
+  applicationId :string,
+  coordinatorId :string
 }
 
 export type groupId = z.infer<typeof groupIdParamsSchema>

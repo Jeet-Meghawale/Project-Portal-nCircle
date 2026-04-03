@@ -1,4 +1,4 @@
-import { ApplicationStatus, MemberRole } from "@prisma/client"
+import { ApplicationMember, ApplicationStatus, MemberRole } from "@prisma/client"
 import { string } from "zod"
 
 /*
@@ -81,4 +81,15 @@ Application Member Input
 export interface ApplicationMemberInput {
   userId: string
   role: MemberRole
+}
+
+export type ApprovedApplication = {
+  id: string,
+  projectId: string,
+  coordinatorId: string,
+  leaderId: string,
+  status: ApplicationStatus,
+  createdAt: Date,
+  updatedAt: Date,
+  members: ApplicationMember[]
 }

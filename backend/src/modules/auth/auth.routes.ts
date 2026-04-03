@@ -4,6 +4,8 @@ import { asyncHandler } from "../../utils/async.handler";
 import { authMiddleware } from "../../middlewares/auth.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
 import { Role } from "@prisma/client";
+import { userIdParamSchema } from "../../validators/auth.validator";
+import { validate } from "../../middlewares/zod.validator.middleware";
 
 
 const router = Router();
@@ -63,4 +65,13 @@ router.post(
   authorize(Role.ADMIN),
   asyncHandler(authController.registerBulk)
 )
+
+// update user info
+router.patch(
+  "/users/:id",
+  authMiddleware,
+  validate({params : userIdParamSchema}),
+  authorize(Role.ADMIN),
+  asyncHandler(authController.updateUserController)
+);
 export default router;

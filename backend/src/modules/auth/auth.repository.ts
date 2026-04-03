@@ -1,7 +1,5 @@
 import { prisma } from "../../database/client"
 import { RegisterUserInput } from "./auth.types"
-import { RegisterInput } from "../../validators/auth.validator"
-import { register } from "node:module"
 import { Prisma } from "@prisma/client"
 
 
@@ -47,14 +45,6 @@ export const authRepository = {
     });
   },
 
-  async revokeAllUserTokens(userId: string) {
-    return prisma.refreshToken.updateMany({
-      where: { userId },
-      data: {
-        revoked: true
-      }
-    })
-  },
 
   async updateRefreshToken(userId: string, token: string) {
     return prisma.refreshToken.update({
@@ -84,4 +74,10 @@ export const authRepository = {
       data: users
     });
   },
+  async updateUser(userId: string, updateData: Partial<RegisterUserInput>) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: updateData
+    });
+  }
 }

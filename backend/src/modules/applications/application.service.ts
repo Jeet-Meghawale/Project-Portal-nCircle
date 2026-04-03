@@ -1,10 +1,28 @@
-import { ApplicationStatus, MemberRole } from "@prisma/client";
+import { ApplicationStatus, MemberRole, WorkspaceRole } from "@prisma/client";
 import { applicationRepository } from "./application.repository";
-import { CreateApplicationServiceInput, UpdateApplicationServiceInput } from "./application.types";
-import { prisma } from "../../database/client";
-import { application } from "express";
+import { ApprovedApplication, CreateApplicationServiceInput, UpdateApplicationServiceInput } from "./application.types";
 import { ApiError } from "../../utils/api.error";
-import app from "../../app";
+import { groupService } from "../groups/group.service";
+import { workspaceService } from "../workspaces/workspace.service";
+import { prisma } from "../../database/client";
+
+
+
+
+
+const mapToWorkspaceRole = (role: MemberRole): WorkspaceRole => {
+    switch (role) {
+        case MemberRole.LEADER:
+            return WorkspaceRole.LEADER;
+
+        case MemberRole.MEMBER:
+            return WorkspaceRole.MEMBER;
+
+        default:
+            throw new Error("Invalid member role");
+    }
+};
+
 
 export const applicationService = {
     async getApplicationById(id: string) {
@@ -71,6 +89,7 @@ export const applicationService = {
                 approvedBy: userId,
                 isApproved: true
             }
+            this.handleApproval(application);
             return applicationRepository.updateApplication(id, data);
         }
 
@@ -129,5 +148,42 @@ export const applicationService = {
 
     },
 
+    async handleApproval(application: ApprovedApplication) {
+  return prisma.$transaction(async (tx) => {
 
+    const dbMembers = await applicationRepository.getApplicationMembers(tx, {
+      applicationId: application.id
+    });
+
+    const group = await groupService.createGroupTx(tx, {
+      projectId: application.projectId,
+      coordinatorId: application.coordinatorId,
+      applicationId: application.id,
+      members: dbMembers
+    });
+
+    const workspaceMembers = [
+      ...dbMembers.map(m => ({
+        userId: m.userId,
+        role: mapToWorkspaceRole(m.role) as WorkspaceRole
+      })),
+      {
+        userId: application.coordinatorId,
+        role: WorkspaceRole.COORDINATOR
+      }
+    ];
+
+    await workspaceService.createWorkspaceTx(
+      tx,
+      {
+        groupId: group.id,
+        projectId: application.projectId,
+        coordinatorId: application.coordinatorId,
+      },
+      workspaceMembers
+    );
+
+    return group;
+  });
+}
 }

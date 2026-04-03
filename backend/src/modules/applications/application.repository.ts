@@ -1,5 +1,9 @@
+import { get } from "node:http";
 import { prisma } from "../../database/client";
 import { CreateApplicationDTO, CreateApplicationOnly } from "./application.types";
+import { PrismaClient, Prisma } from "@prisma/client";
+
+type DB = PrismaClient | Prisma.TransactionClient;
 
 export const applicationRepository = {
     createApplication(create: CreateApplicationOnly, members: any) {
@@ -23,7 +27,10 @@ export const applicationRepository = {
     },
     getApplicationById(id: string) {
         return prisma.projectApplication.findUnique({
-            where: { id }
+            where: { id },
+            include: {
+                members: true
+            }
         });
     },
     getApplication(filter: any) {
@@ -42,6 +49,11 @@ export const applicationRepository = {
             dto
         );
     },
+    getApplicationMembers(db: DB, filter: any) {
+        return db.applicationMember.findMany({
+            where: filter
+        });
+    }
 
 
 }

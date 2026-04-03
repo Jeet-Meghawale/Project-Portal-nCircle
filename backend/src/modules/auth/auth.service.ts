@@ -19,7 +19,7 @@ export const authService = {
     const existingUser = await authRepository.findUserByEmail(validatedData.email)
 
     if (existingUser) {
-      throw new ApiError(409,"User already exists")
+      throw new ApiError(409, "User already exists")
     }
 
     // Hash Password
@@ -100,6 +100,9 @@ export const authService = {
     if (!storedToken) {
       throw new ApiError(401, "Refresh Token mismatch");
     }
+    if (storedToken.token !== refreshToken) {
+      throw new ApiError(401, "Refresh token mismatch");
+    }
 
     if (storedToken.revoked) {
       throw new ApiError(401, "Refresh token revoked");
@@ -158,7 +161,7 @@ export const authService = {
     return authRepository.getAllUsersbyFilter({});
   },
   getUsersByFilter(filter: any) {
-    return authRepository.getAllUsersbyFilter(filter); 
+    return authRepository.getAllUsersbyFilter(filter);
   },
   async registerBulk(users: RegisterInput[]) {
     const validUsers = users.map(user => registerSchema.parse(user));
@@ -173,5 +176,13 @@ export const authService = {
       };
     }));
     return authRepository.registerBulk(usersData);
+  },
+  async updateUser(userId: string, updateData: Partial<RegisterUserInput>) {
+    if (updateData.password) {
+      updateData.password = await hashPassword(updateData.password) as string;
+    } else {
+      delete updateData.password;
+    }
+    return authRepository.updateUser(userId, updateData);
   },
 }

@@ -1,71 +1,90 @@
-import { prisma } from "../../database/client";
+import { PrismaClient, Prisma, WorkspaceRole } from "@prisma/client";
+
+type DB = PrismaClient | Prisma.TransactionClient;
 
 export const workspaceRepository = {
-    async createWorkspace(data: any, members: any) {
-        return prisma.$transaction(async (tx) => {
-            const workspace = await tx.workspace.create(
-                data
-            );
-            await Promise.all(
-                members.map((member: any) =>
-                    tx.workspaceMember.create({
-                        data: {
-                            workspaceId: workspace.id,
-                            userId: member.userId,
-                            role: member.role
-                        }
-                    })
-                )
+
+    async createWorkspace(
+        db: DB,
+        data: {
+            groupId: string;
+            projectId: string;
+        },
+        members: { userId: string; role: WorkspaceRole }[]
+    ) {
+        const workspace = await db.workspace.create({
+            data
+        });
+
+        const uniqueMembers = Array.from(
+            new Map(members.map(m => [m.userId, m])).values()
+        );
+
+        await Promise.all(
+            uniqueMembers.map(member =>
+                db.workspaceMember.create({
+                    data: {
+                        workspaceId: workspace.id,
+                        userId: member.userId,
+                        role: member.role
+                    }
+                })
             )
-            return workspace;
-        });
+        );
+
+        return workspace;
     },
-    async updateWorkspace(id: string, data: any) {
-        return prisma.workspace.update({
+
+    updateWorkspace(db: DB, id: string, data: any) {
+        return db.workspace.update({
             where: { id },
             data
-        })
+        });
     },
-    async getWorkspace(filter: any) {
-        return prisma.workspace.findMany({
+
+    getWorkspace(db: DB, filter: any) {
+        return db.workspace.findMany({
             where: filter
-        }
-        )
+        });
     },
-    async getWorkspaceById(id: string) {
-        return prisma.workspace.findUnique({
+
+    getWorkspaceById(db: DB, id: string) {
+        return db.workspace.findUnique({
             where: { id }
         });
     },
-    async addWorkspaceMember(data: any) {
-        return prisma.workspaceMember.create({
-            data
-        })
+
+    addWorkspaceMember(db: DB, data: any) {
+        return db.workspaceMember.create({ data });
     },
-    async updateWorkspaceMember(id: string, data: any) {
-        return prisma.workspaceMember.update({
+
+    updateWorkspaceMember(db: DB, id: string, data: any) {
+        return db.workspaceMember.update({
             where: { id },
             data
-        })
+        });
     },
-    async getWorkspaceMemberByFilter(filter: any) {
-        return prisma.workspaceMember.findMany({
+
+    getWorkspaceMemberByFilter(db: DB, filter: any) {
+        return db.workspaceMember.findMany({
             where: filter
-        })
+        });
     },
-    async getWorkspaceMemberById(id: string) {
-        return prisma.workspaceMember.findUnique({
+
+    getWorkspaceMemberById(db: DB, id: string) {
+        return db.workspaceMember.findUnique({
             where: { id }
-        })
+        });
     },
-    async getAllWokspaceWhereMemberIsActive(userId: string) {
-        return prisma.workspace.findMany({
+
+    getAllWorkspaceWhereMemberIsActive(db: DB, userId: string) {
+        return db.workspace.findMany({
             where: {
-                isActive: true, // workspace active
+                isActive: true,
                 members: {
                     some: {
-                        userId: userId,
-                        isActive: true // member active
+                        userId,
+                        isActive: true
                     }
                 }
             },
@@ -75,19 +94,18 @@ export const workspaceRepository = {
             }
         });
     },
-    async getWorkspaceByIdForActiveMember(id: string, userId: string) {
-        return prisma.workspace.findUnique({
+
+    getWorkspaceByIdForActiveMember(db: DB, id: string, userId: string) {
+        return db.workspace.findFirst({ // ✅ FIXED
             where: {
                 id,
                 members: {
                     some: {
-                        userId: userId,
-                        isActive: true // member active
-
+                        userId,
+                        isActive: true
                     }
                 }
             }
         });
     },
-    
-}
+};
