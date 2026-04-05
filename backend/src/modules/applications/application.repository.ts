@@ -53,7 +53,20 @@ export const applicationRepository = {
         return db.applicationMember.findMany({
             where: filter
         });
-    }
-
-
+    },
+    findUsersAlreadyApplied(projectId: string, userIds: string[]) {
+        return prisma.applicationMember.findMany({
+            where: {
+                userId: { in: userIds },
+                application: {
+                    projectId
+                }
+            },
+            select: {
+                userId: true
+            }
+        });
+    },
 }
+
+

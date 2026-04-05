@@ -50,6 +50,15 @@ export const applicationService = {
             throw new Error("Maximum 7 members allowed");
         }
 
+        const userIds = finalMembers.map(m => m.userId);
+
+        const alreadyAppliedUsers =
+            await applicationRepository.findUsersAlreadyApplied(projectId, userIds);
+
+        if (alreadyAppliedUsers.length > 0) {
+            const ids = alreadyAppliedUsers.map(u => u.userId);
+            throw new Error(`These users already applied to this project: ${ids.join(", ")}`);
+        }
         return await applicationRepository.createApplication(create, finalMembers);
 
     },
@@ -149,41 +158,41 @@ export const applicationService = {
     },
 
     async handleApproval(application: ApprovedApplication) {
-  return prisma.$transaction(async (tx) => {
+        return prisma.$transaction(async (tx) => {
 
-    const dbMembers = await applicationRepository.getApplicationMembers(tx, {
-      applicationId: application.id
-    });
+            const dbMembers = await applicationRepository.getApplicationMembers(tx, {
+                applicationId: application.id
+            });
 
-    const group = await groupService.createGroupTx(tx, {
-      projectId: application.projectId,
-      coordinatorId: application.coordinatorId,
-      applicationId: application.id,
-      members: dbMembers
-    });
+            const group = await groupService.createGroupTx(tx, {
+                projectId: application.projectId,
+                coordinatorId: application.coordinatorId,
+                applicationId: application.id,
+                members: dbMembers
+            });
 
-    const workspaceMembers = [
-      ...dbMembers.map(m => ({
-        userId: m.userId,
-        role: mapToWorkspaceRole(m.role) as WorkspaceRole
-      })),
-      {
-        userId: application.coordinatorId,
-        role: WorkspaceRole.COORDINATOR
-      }
-    ];
+            const workspaceMembers = [
+                ...dbMembers.map(m => ({
+                    userId: m.userId,
+                    role: mapToWorkspaceRole(m.role) as WorkspaceRole
+                })),
+                {
+                    userId: application.coordinatorId,
+                    role: WorkspaceRole.COORDINATOR
+                }
+            ];
 
-    await workspaceService.createWorkspaceTx(
-      tx,
-      {
-        groupId: group.id,
-        projectId: application.projectId,
-        coordinatorId: application.coordinatorId,
-      },
-      workspaceMembers
-    );
+            await workspaceService.createWorkspaceTx(
+                tx,
+                {
+                    groupId: group.id,
+                    projectId: application.projectId,
+                    coordinatorId: application.coordinatorId,
+                },
+                workspaceMembers
+            );
 
-    return group;
-  });
-}
+            return group;
+        });
+    }
 }
