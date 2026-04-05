@@ -133,6 +133,7 @@ model Project {
   applications ProjectApplication[]
   groups       Group[]
   workspace    Workspace[]
+  tags         ProjectTag[]
 
   @@index([createdBy])
 }
@@ -334,4 +335,22 @@ model File {
 
   uploadedBy String
   user       User   @relation(fields: [uploadedBy], references: [id])
+}
+
+model tags{
+  name String @id @unique
+
+  projects ProjectTag[]
+}
+
+model ProjectTag {
+  id String @id @default(uuid())
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  tagName String
+  tag     tags   @relation(fields: [tagName], references: [name])
+
+  @@unique([projectId, tagName])
 }
