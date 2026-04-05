@@ -4,7 +4,7 @@ import { asyncHandler } from "../../utils/async.handler";
 import { authMiddleware } from "../../middlewares/auth.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
 import { Role } from "@prisma/client";
-import { userIdParamSchema } from "../../validators/auth.validator";
+import { userIdParamSchema, verifyRoleSchema } from "../../validators/auth.validator";
 import { validate } from "../../middlewares/zod.validator.middleware";
 
 
@@ -73,5 +73,13 @@ router.patch(
   validate({params : userIdParamSchema}),
   authorize(Role.ADMIN),
   asyncHandler(authController.updateUserController)
+);
+
+// verify role
+router.get(
+  "/verify-role",
+  validate({body : verifyRoleSchema}),
+  authMiddleware,
+  asyncHandler(authController.verifyRoleController)
 );
 export default router;

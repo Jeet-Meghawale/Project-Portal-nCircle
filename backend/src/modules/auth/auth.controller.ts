@@ -95,5 +95,13 @@ export const authController = {
 
         const updatedUser = await authService.updateUser(userId, updateData);
         sendResponse(res, 200, updatedUser, "User updated successfully");
-    }
+    },
+    async verifyRoleController(req: Request, res: Response) {
+        const { email, role } = req.body;
+        const hasRole = await authService.verifyRole(email, role);
+        if(hasRole === "User not found") {
+            return sendResponse(res, 404, null, "User not found");
+        }
+        sendResponse(res, 200, { hasRole }, "Role verified successfully");
+    },
 }

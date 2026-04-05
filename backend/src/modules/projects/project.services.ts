@@ -1,6 +1,7 @@
 import { ProjectVisibility } from "@prisma/client";
 import { projectRepository } from "./project.repository";
 import { ApiError } from "../../utils/api.error";
+import { get } from "node:http";
 
 export const projectService={
     async createProject(adminId:string, dto:any){
@@ -10,7 +11,7 @@ export const projectService={
         });
     },
     async listProjectsAdmin(){
-        return projectRepository.getProjects({});
+        return projectRepository.getProjectsForAdmin({});
         
     },
     async listProjects(){
@@ -49,4 +50,7 @@ export const projectService={
         }
         return project;
     },
+    getProjectByIdForAdmin(id:string){
+        return projectRepository.getProjectByIdForAdmin(id);
+    }
 }

@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { email, z } from "zod"
 import { Role } from "@prisma/client"
 
 export const registerSchema = z
@@ -42,4 +42,9 @@ export type RegisterInput = z.infer<typeof registerSchema>
 
 export const userIdParamSchema = z.object({
   userId: z.string().uuid()
+})
+
+export const verifyRoleSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  role: z.nativeEnum(Role)
 })

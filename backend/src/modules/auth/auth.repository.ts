@@ -79,5 +79,15 @@ export const authRepository = {
       where: { id: userId },
       data: updateData
     });
+  },
+  async verifyUserRole(email: string, role: string) {
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+    if(!user) {
+      return "User not found";
+    }
+    return user?.role === role;
   }
+
 }

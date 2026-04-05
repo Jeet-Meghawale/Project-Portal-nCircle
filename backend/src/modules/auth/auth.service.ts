@@ -185,4 +185,7 @@ export const authService = {
     }
     return authRepository.updateUser(userId, updateData);
   },
+  async verifyRole(email: string, role: Role) {
+    return authRepository.verifyUserRole(email, role);
+  }
 }

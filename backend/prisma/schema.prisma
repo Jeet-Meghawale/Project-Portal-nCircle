@@ -132,7 +132,7 @@ model Project {
 
   applications ProjectApplication[]
   groups       Group[]
-  workspcae    Workspace[]
+  workspace    Workspace[]
 
   @@index([createdBy])
 }

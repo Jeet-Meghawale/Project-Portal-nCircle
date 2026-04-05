@@ -33,7 +33,7 @@ export const projectController = {
     },
     async getProjectByIdAdmin(req: Request, res: Response) {
         const projectId = req.validated?.params?.id;
-        const project = await projectService.getProject(projectId);
+        const project = await projectService.getProjectByIdForAdmin(projectId);
 
         sendResponse(res, 200, project)
     },

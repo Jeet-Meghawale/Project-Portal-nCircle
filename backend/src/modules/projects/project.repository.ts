@@ -14,7 +14,18 @@ export const projectRepository = {
     },
     getProjectbyId(id: string) {
         return prisma.project.findUnique({
-            where: { id }
+            where: { id },
+            include: {
+                creator: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true
+                    }
+                }
+            }
+
         });
     },
     updateProject(id: string, data: any) {
@@ -23,6 +34,50 @@ export const projectRepository = {
             data
         });
     },
-    
+    getProjectByIdForAdmin(id: string) {
+        return prisma.project.findUnique({
+            where: { id },
+            include: {
+                creator: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true
+                    }
+                },
+                _count: {
+                    select: {
+                        applications: true,
+                        workspace: true
+                    }
 
+                }
+            }
+        });
+
+    },
+    getProjectsForAdmin(filter: any) {
+        return prisma.project.findMany({
+            where: filter,
+            orderBy: { createdAt: "desc" },
+            include: {
+                creator: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true
+                    }
+                },
+                _count: {
+                    select: {
+                        applications: true,
+                        workspace: true
+                    }
+
+                }
+            }
+        });
+    }
 }
