@@ -21,7 +21,11 @@ export const FilesController = {
     },
     async deleteFile(req: Request, res: Response) {
         const fileId = req.params.fileId as string;
-        await filesService.deleteFile(fileId);
-        sendResponse(res, 200, {}, "File deleted successfully");
+        const result = await filesService.deleteFile(fileId);
+        if(!result) {
+            sendResponse(res, 404, {}, "File not found");
+            return;
+        }
+        sendResponse(res, 200, result, "File deleted successfully");
     }
 };

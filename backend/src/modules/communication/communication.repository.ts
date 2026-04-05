@@ -1,6 +1,5 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../../database/client";
-import { create } from "node:domain";
 
 export const ThreadCommunicationRepository = {
     createCommunication(data: Prisma.CommunicationCreateInput){

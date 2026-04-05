@@ -45,7 +45,7 @@ export const filesService = {
     async deleteFile(fileId: string) {
         const file = await FilesRepository.getFileById(fileId);
         if (!file) {
-            throw new Error("File not found");
+            return ;
         };
         // delete from s3
         const key = file.path.split('/').slice(-1)[0] as string; // get the last part of the url which is the key

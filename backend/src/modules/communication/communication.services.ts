@@ -1,6 +1,5 @@
 import { createCommunicationInput, workspaceCommunicationInput } from "./communication.types";
 import { ThreadCommunicationRepository, WorkspaceCommunicationRepository } from "./communication.repository";
-import { get } from "node:http";
 
 export const ThreadCommunicationService = {
     createCommunication(dto: createCommunicationInput , userId: string) {
