@@ -61,5 +61,23 @@ export const projectController = {
         }
         sendResponse(res, 200, result.data);
 
+    },
+    async addTagsToProject(req: Request, res: Response) {
+        const projectId = req.validated?.params?.projectId;
+        const { tags } = req.body;
+        const result = await projectService.addTagsToProject(projectId, tags);
+        if (result.status === 404) {
+            return sendResponse(res, 404, null, "Project not found");
+        }
+        sendResponse(res, 200, result.data, "Tags added to project successfully");
+    },
+    async removeTagsFromProject(req: Request, res: Response) {
+        const projectId = req.validated?.params?.projectId;
+        const { tags } = req.body;
+        const result = await projectService.removeTagsFromProject(projectId, tags);
+        if (result.status === 404) {
+            return sendResponse(res, 404, null, "Project not found");
+        }
+        sendResponse(res, 200, result.data, "Tags removed from project successfully");
     }
 }

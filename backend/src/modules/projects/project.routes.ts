@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authorize } from "../../middlewares/rbac.middleware";
 import { validate } from "../../middlewares/zod.validator.middleware";
-import { createProjectSchema, ProjectIdParamSchema, updateProjectSchema } from "../../validators/project.validator";
+import { addTagsSchema, createProjectSchema, ProjectIdParamSchema, updateProjectSchema } from "../../validators/project.validator";
 import { projectController } from "./project.controller";
 import { Role } from "@prisma/client";
 import { asyncHandler } from "../../utils/async.handler";
@@ -72,6 +72,27 @@ router.get(
 
     asyncHandler(projectController.listVisible)
 )
+
+// add tags to project
+router.post(
+    "/:projectId/tags",
+    validate({
+        params: ProjectIdParamSchema,
+        body: addTagsSchema
+    }),
+    asyncHandler(projectController.addTagsToProject)
+)
+
+// remove tags from project
+router.delete(
+    "/:projectId/tags",
+    validate({
+        params: ProjectIdParamSchema,
+        body: addTagsSchema
+    }),
+    asyncHandler(projectController.removeTagsFromProject)
+)
+
 
 // count of all Project
 

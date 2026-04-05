@@ -8,9 +8,13 @@ import reviewsRoutes from "../modules/reviews/reviews.routes"
 import threadsRoutes from "../modules/threads/threads.routes"
 import communicationRoutes from "../modules/communication/communication.routes"
 import fileRoutes from "../modules/files/files.routes"
+import tagRoutes from "../modules/tags/tags.routes";
+
+
 const router = Router();
 
 router.use("/auth", authRoutes);
+router.use("/tags", tagRoutes);
 router.use("/project",projectRoutes)
 router.use("/application",applicationRoutes)
 router.use("/group",groupRoutes)

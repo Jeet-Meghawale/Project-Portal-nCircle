@@ -79,5 +79,35 @@ export const projectRepository = {
                 }
             }
         });
-    }
+    },
+
+    addtagstoProject(projectId: string, tags: string[]) {
+        return prisma.project.update({
+            where: { id: projectId },
+            data: {
+                tags: {
+                    create: tags.map(tag => ({
+                        tag: {
+                            connectOrCreate: {
+                                where: { name: tag },
+                                create: { name: tag }
+                            }
+                        }
+                    }))
+                }
+            }
+        });
+    },
+    deletetagfromProject(projectId: string, tags: string[]) {
+        return prisma.project.update({
+            where: { id: projectId },
+            data: {
+                tags: {
+                    deleteMany: {
+                        tagName: { in: tags }
+                    }
+                }
+            }
+        });
+    },
 }

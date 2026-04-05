@@ -57,5 +57,23 @@ export const projectService = {
     },
     getProjectByIdForAdmin(id: string) {
         return projectRepository.getProjectByIdForAdmin(id);
-    }
+    },
+    async addTagsToProject(projectId: string, tags: string[]) {
+        const project = await projectRepository.getProjectbyId(projectId);
+        if (!project) {
+            return { status: 404};
+        }
+        const uniqueTags = Array.from(new Set(tags));
+        const result = await projectRepository.addtagstoProject(projectId, uniqueTags);
+        return { status: 200, data: result };
+    },
+    async removeTagsFromProject(projectId: string, tags: string[]) {
+        const project = await projectRepository.getProjectbyId(projectId);
+        if (!project) {
+            return { status: 404 };
+        }
+        const result = await projectRepository.deletetagfromProject(projectId, tags);
+        return { status: 200, data: result };
+    },
+
 }
