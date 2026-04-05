@@ -47,15 +47,19 @@ export const projectController = {
     },
     async toggleVisibility(req: Request, res: Response) {
         const projectId = req.validated?.params?.id;
-        const result = projectService.toggleVisibility(projectId);
-
+        const result = await projectService.toggleVisibility(projectId);
+        if(result === 404) {
+            return sendResponse(res, 404, null, "Project not found");
+        }
         sendResponse(res, 200, result);
     },
     async listVisible(req: Request, res: Response) {
         const projectId = req.validated?.params?.id;
-        const result = projectService.listVisible(projectId);
-
-        sendResponse(res, 200, result);
+        const result = await projectService.listVisible(projectId);
+        if (result.status === 404) {
+            return sendResponse(res, 404, null, "Project not found");
+        }
+        sendResponse(res, 200, result.data);
 
     }
 }
