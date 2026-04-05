@@ -19,7 +19,7 @@ export const authService = {
     const existingUser = await authRepository.findUserByEmail(validatedData.email)
 
     if (existingUser) {
-      throw new ApiError(409, "User already exists")
+      return 409; // Conflict
     }
 
     // Hash Password
@@ -49,7 +49,7 @@ export const authService = {
     const user = await authRepository.findUserByEmail(email);
 
     if (!user) {
-      throw new ApiError(401, "Invalid credentials");
+      return { status: 404 };
     }
 
     const isPasswordValid = await comparePassword(
@@ -57,7 +57,7 @@ export const authService = {
       user.password
     )
     if (!isPasswordValid) {
-      throw new ApiError(401, "Invalid credentials");
+      return { status: 401 };
     }
     const accessToken = generateAccessToken(user.id);
     const refreshToken = generateRefreshToken(user.id);
@@ -85,30 +85,30 @@ export const authService = {
 
   async refresh(refreshToken: string) {
     if (!refreshToken) {
-      throw new ApiError(401, "Refresh token missing");
+      return { status: 401 };
     }
 
     let decoded: any;
     try {
       decoded = verifyRefreshToken(refreshToken);
     } catch (err) {
-      throw new ApiError(401, "Invalid refresh token");
+      return { status: 401 };
     }
     const userId = decoded.userId;
 
     const storedToken = await authRepository.findExistingToken(userId);
     if (!storedToken) {
-      throw new ApiError(401, "Refresh Token mismatch");
+      return { status: 401 };
     }
     if (storedToken.token !== refreshToken) {
-      throw new ApiError(401, "Refresh token mismatch");
+      return { status: 401 };
     }
 
     if (storedToken.revoked) {
-      throw new ApiError(401, "Refresh token revoked");
+      return { status: 401 };
     }
     if (storedToken.expiresAt < new Date()) {
-      throw new ApiError(401, "Refresh token expired")
+      return { status: 401 };
     }
     const newAccessToken = generateAccessToken(userId);
     const newRefreshToken = generateRefreshToken(userId);
@@ -125,17 +125,20 @@ export const authService = {
     const user = await authRepository.findUserById(userId);
 
     if (!user) {
-      throw new ApiError(404, "User not found");
+      return { status: 404 };
     }
 
     const { password: _, ...safeUser } = user;
 
-    return safeUser;
+    return {
+      status: 200,
+      data: safeUser
+    };
   },
   async logout(refreshToken: string) {
 
     if (!refreshToken) {
-      throw new ApiError(401, "Refresh token missing");
+      return { status: 401 };
     }
 
     let decoded: any;
@@ -143,7 +146,7 @@ export const authService = {
     try {
       decoded = verifyRefreshToken(refreshToken);
     } catch {
-      throw new ApiError(401, "Invalid refresh token");
+      return { status: 401 };
     }
 
     const userId = decoded.userId;
@@ -151,10 +154,11 @@ export const authService = {
     const storedToken = await authRepository.findExistingToken(userId);
 
     if (!storedToken) {
-      throw new ApiError(404, "Refresh token not found");
+      return { status: 404 };
     }
 
-    return authRepository.revokeRefreshToken(userId);
+    await authRepository.revokeRefreshToken(userId);
+    return { status: 200 };
   },
 
   getAllUsers() {

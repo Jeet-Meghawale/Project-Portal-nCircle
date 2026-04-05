@@ -5,6 +5,10 @@ import { sendResponse } from "../../utils/send.response";
 export const authController = {
     async registerController(req: Request, res: Response) {
         const user = await authService.registerUser(req.body);
+        if (user === 409) {
+            sendResponse(res, 409, null, "User already exists");
+            return;
+        }
         return res.status(201).json({
             success: true,
             message: "User Created Successfully",
@@ -15,6 +19,14 @@ export const authController = {
         const { email, password } = req.body;
 
         const result = await authService.login(email, password);
+        if (result.status === 401) {
+            sendResponse(res, 401, null, "Invalid credentials");
+            return;
+        }
+        if (result.status === 404) {
+            sendResponse(res, 404, null, "User not found");
+            return;
+        }
 
         res.cookie("refreshToken", result.refreshToken, {
             httpOnly: true,
@@ -32,7 +44,14 @@ export const authController = {
         const refreshToken = req.cookies?.refreshToken;
 
         const result = await authService.refresh(refreshToken);
-
+        if (result.status === 401) {
+            sendResponse(res, 401, null, "Invalid refresh token");
+            return;
+        }
+        if (result.status === 404) {
+            sendResponse(res, 404, null, "User not found");
+            return;
+        }
         res.cookie("refreshToken", result.refreshToken, {
             httpOnly: true,
             secure: false,
@@ -51,17 +70,28 @@ export const authController = {
 
         const user = await authService.getMe(userId);
 
+        if (user.status === 404) {
+            sendResponse(res, 404, null, "User not found");
+            return;
+        }
         res.status(200).json({
             success: true,
-            data: user
+            data: user.data
         });
     },
     async logoutController(req: Request, res: Response) {
 
         const refreshToken = req.cookies?.refreshToken;
 
-        await authService.logout(refreshToken);
+        const result = await authService.logout(refreshToken);
 
+        if (result.status === 401) {
+            return sendResponse(res, 401, null, "Invalid or missing token");
+        }
+
+        if (result.status === 404) {
+            return sendResponse(res, 404, null, "Session not found");
+        }
         res.clearCookie("refreshToken", {
             httpOnly: true,
             secure: false,
@@ -76,7 +106,7 @@ export const authController = {
     async getAllUsers(req: Request, res: Response) {
         const users = await authService.getAllUsers();
 
-        sendResponse(res, 200,users, "Users fetched successfully");
+        sendResponse(res, 200, users, "Users fetched successfully");
     },
     async getUsersByFilter(req: Request, res: Response) {
         const filter = req.query;
@@ -99,7 +129,7 @@ export const authController = {
     async verifyRoleController(req: Request, res: Response) {
         const { email, role } = req.body;
         const hasRole = await authService.verifyRole(email, role);
-        if(hasRole === "User not found") {
+        if (hasRole === "User not found") {
             return sendResponse(res, 404, null, "User not found");
         }
         sendResponse(res, 200, { hasRole }, "Role verified successfully");
