@@ -47,7 +47,7 @@ export const applicationService = {
 
         //max 7 members
         if (finalMembers.length > 7) {
-            throw new Error("Maximum 7 members allowed");
+            return "Maximum 7 members allowed";
         }
 
         const userIds = finalMembers.map(m => m.userId);
@@ -57,7 +57,7 @@ export const applicationService = {
 
         if (alreadyAppliedUsers.length > 0) {
             const ids = alreadyAppliedUsers.map(u => u.userId);
-            throw new Error(`These users already applied to this project: ${ids.join(", ")}`);
+            return `These users already applied to this project: ${ids.join(", ")}`;
         }
         return await applicationRepository.createApplication(create, finalMembers);
 
@@ -83,7 +83,7 @@ export const applicationService = {
         if (application?.status === ApplicationStatus.CANCELLED) {
             return "Application canceled"
         }
-        throw new ApiError(404, "Application not found");
+        return "Application not found";
 
 
     },
@@ -114,17 +114,17 @@ export const applicationService = {
         if (application?.status === ApplicationStatus.APPROVED) {
             return "Application already approved"
         }
-        throw new ApiError(404, "Application not found");
+        return "Application not found";
 
 
 
     },
     async cancelApplication(id: string, userId: string) {
         const application = await applicationRepository.getApplicationById(id);
-        if (application === null) throw new ApiError(404, "Application not found");
+        if (application === null) return"Application not found";
 
         if (application?.leaderId !== userId) {
-            throw new ApiError(403, "You are not Project Leader")
+            return "You are not the Project Leader";
         }
         if (application.status === ApplicationStatus.PENDING_COORDINATOR) {
 
@@ -146,7 +146,7 @@ export const applicationService = {
     },
     async updateApplication(id: string, dto: UpdateApplicationServiceInput) {
         const application = await applicationRepository.getApplicationById(id);
-        if (application === null) throw new ApiError(404, "Application not found");
+        if (application === null) return "Application not found";
 
         if (application.status === ApplicationStatus.PENDING_COORDINATOR)
             return applicationRepository.updateApplication(id, dto);

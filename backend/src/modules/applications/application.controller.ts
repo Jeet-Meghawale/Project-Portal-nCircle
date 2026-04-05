@@ -31,6 +31,8 @@ export const applicationController = {
         }
         const result = await applicationService.createApplication(serviceInput);
         if (result === null) sendResponse(res, 500, {}, "Application creation failed");
+        if(typeof result === "string") sendResponse(res, 400, {}, result);
+        else
         sendResponse(res, 200, result, "Application Created");
 
     },
