@@ -27,6 +27,7 @@ export const applicationController = {
             leaderId,
             coordinatorId: body.coordinatorId,
             projectId: body.projectId,
+            proposed_solution: body.proposed_solution,
             members
         }
         const result = await applicationService.createApplication(serviceInput);

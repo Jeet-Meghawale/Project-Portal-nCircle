@@ -29,11 +29,12 @@ export const applicationService = {
         return await applicationRepository.getApplicationById(id);
     },
     async createApplication(data: CreateApplicationServiceInput) {
-        const { leaderId, coordinatorId, projectId, members } = data;
+        const { leaderId, coordinatorId, projectId, members, proposed_solution } = data;
         const create = {
             leaderId,
             coordinatorId,
-            projectId
+            projectId,
+            proposed_solution
         }
         // remove duplicates
         const uniqueMembers = Array.from(
@@ -121,7 +122,7 @@ export const applicationService = {
     },
     async cancelApplication(id: string, userId: string) {
         const application = await applicationRepository.getApplicationById(id);
-        if (application === null) return"Application not found";
+        if (application === null) return "Application not found";
 
         if (application?.leaderId !== userId) {
             return "You are not the Project Leader";
