@@ -110,4 +110,24 @@ export const projectRepository = {
             }
         });
     },
+    createFile(data: any) {
+        return prisma.projectFiles.create({
+            data
+        });
+    },
+    deleteFile(fileId: string) {
+        return prisma.projectFiles.delete({
+            where: { id: fileId }
+        });
+    },
+    getFileById(fileId: string) {
+        return prisma.projectFiles.findUnique({
+            where: { id: fileId }
+        });
+    },
+    getFilesForProject(projectId: string) {
+        return prisma.projectFiles.findMany({
+            where: { projectId }
+        });
+    }
 }

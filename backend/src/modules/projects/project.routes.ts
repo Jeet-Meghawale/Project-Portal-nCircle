@@ -6,6 +6,7 @@ import { projectController } from "./project.controller";
 import { Role } from "@prisma/client";
 import { asyncHandler } from "../../utils/async.handler";
 import { authMiddleware } from "../../middlewares/auth.middleware";
+import { upload } from "../../middlewares/uploads.middleware";
 
 const router = Router();
 
@@ -91,6 +92,33 @@ router.delete(
         body: addTagsSchema
     }),
     asyncHandler(projectController.removeTagsFromProject)
+)
+
+
+// add file to projectId
+router.post(
+    "/:projectId/files",
+    validate({ params: ProjectIdParamSchema }),
+    authorize(Role.ADMIN),
+    upload.single("file"),
+    asyncHandler(projectController.addFileToProject)
+)
+
+// remove file from projectId
+router.delete(
+    "/:projectId/files/:fileId",
+    validate({
+        params: ProjectIdParamSchema
+    }),
+    authorize(Role.ADMIN),
+    asyncHandler(projectController.removeFileFromProject)
+)
+
+// get all files for projectId
+router.get(
+    "/:projectId/files",
+    validate({ params: ProjectIdParamSchema }),
+    asyncHandler(projectController.getFilesForProject)
 )
 
 

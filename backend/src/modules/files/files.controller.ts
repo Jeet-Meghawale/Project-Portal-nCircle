@@ -1,6 +1,7 @@
 import {Request, Response} from 'express';
 import { sendResponse } from '../../utils/send.response';
 import { filesService } from './files.services';
+import { get } from 'node:http';
 
 
 export const FilesController = {
@@ -27,5 +28,11 @@ export const FilesController = {
             return;
         }
         sendResponse(res, 200, result, "File deleted successfully");
+    },
+    getFilesForThread(req: Request, res: Response) {
+        const threadId = req.params.threadId as string;
+        const result = filesService.getFilesForThread(threadId);
+        sendResponse(res, 200, result, "Files retrieved successfully");
     }
+
 };
