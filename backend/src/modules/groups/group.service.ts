@@ -1,3 +1,4 @@
+import { get } from "node:http";
 import { prisma } from "../../database/client";
 import { groupRepository } from "./group.repository";
 import { createGroupDTO, createGroupDTONoMembers, updateGroupDTO } from "./group.types";
@@ -14,7 +15,6 @@ export const groupService = {
             coordinatorId,
             applicationId
         }
-        const data ={}
         return groupRepository.createGroup(prisma, createGroupData, members);
     },
     async getAllGroupsByProject(projectId: string) {
@@ -45,5 +45,8 @@ export const groupService = {
             coordinatorId,
             applicationId
         }, members);
-    }
+    },
+    async getGroupByFilter(db: DB, filter: Prisma.GroupWhereInput) {
+        return groupRepository.getGroupByFilter(db, filter);
+    },
 }
