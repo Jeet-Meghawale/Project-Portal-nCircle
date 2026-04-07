@@ -134,4 +134,8 @@ export const authController = {
         }
         sendResponse(res, 200, { hasRole }, "Role verified successfully");
     },
+    async getCoordinatorsController(req: Request, res: Response) {
+        const coordinators = await authService.getCoordinators();
+        sendResponse(res, 200, coordinators, "Coordinators fetched successfully");
+    },
 }

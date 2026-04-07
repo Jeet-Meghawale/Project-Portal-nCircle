@@ -191,5 +191,8 @@ export const authService = {
   },
   async verifyRole(email: string, role: Role) {
     return authRepository.verifyUserRole(email, role);
+  },
+  async getCoordinators() {
+    return authRepository.getCoordinators();
   }
 }

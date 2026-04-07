@@ -1,6 +1,6 @@
 import { prisma } from "../../database/client"
 import { RegisterUserInput } from "./auth.types"
-import { Prisma } from "@prisma/client"
+import { Prisma, Role } from "@prisma/client"
 
 
 export const authRepository = {
@@ -84,10 +84,15 @@ export const authRepository = {
     const user = await prisma.user.findUnique({
       where: { email }
     });
-    if(!user) {
+    if (!user) {
       return "User not found";
     }
     return user?.role === role;
-  }
+  },
+  async getCoordinators() {
+    return prisma.user.findMany({
+      where: { role: Role.COORDINATOR }
+    });
+  },
 
 }

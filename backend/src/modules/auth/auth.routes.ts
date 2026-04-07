@@ -82,4 +82,11 @@ router.get(
   authMiddleware,
   asyncHandler(authController.verifyRoleController)
 );
+
+// get coordinators
+router.get(
+  "/coordinators",
+  authMiddleware,
+  asyncHandler(authController.getCoordinatorsController)
+);
 export default router;
