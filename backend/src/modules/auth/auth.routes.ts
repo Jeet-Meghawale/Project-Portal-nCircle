@@ -76,7 +76,7 @@ router.patch(
 );
 
 // verify role
-router.get(
+router.post(
   "/verify-role",
   validate({body : verifyRoleSchema}),
   authMiddleware,

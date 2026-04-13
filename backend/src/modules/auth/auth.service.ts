@@ -3,6 +3,7 @@ import { RegisterUserInput } from "./auth.types"
 import { registerSchema, RegisterInput } from "../../validators/auth.validator"
 import { comparePassword, hashPassword } from "../../utils/password.util"
 import { Role } from "@prisma/client"
+import { prisma } from "../../database/client";
 import { ApiError } from "../../utils/api.error"
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwt.util"
 import { verify } from "node:crypto"
@@ -190,6 +191,18 @@ export const authService = {
     return authRepository.updateUser(userId, updateData);
   },
   async verifyRole(email: string, role: Role) {
-    return authRepository.verifyUserRole(email, role);
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        role: true
+      }
+    });
+
+    if (!user) return null;
+    if (user.role !== role) return null;
+
+    return user;
   }
 }

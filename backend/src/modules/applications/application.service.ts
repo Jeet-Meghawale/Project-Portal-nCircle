@@ -25,6 +25,9 @@ const mapToWorkspaceRole = (role: MemberRole): WorkspaceRole => {
 
 
 export const applicationService = {
+    async getAdminApplications() {
+        return await applicationRepository.getAdminApplications();
+    },
     async getApplicationById(id: string) {
         return await applicationRepository.getApplicationById(id);
     },
@@ -121,7 +124,7 @@ export const applicationService = {
     },
     async cancelApplication(id: string, userId: string) {
         const application = await applicationRepository.getApplicationById(id);
-        if (application === null) return"Application not found";
+        if (application === null) return "Application not found";
 
         if (application?.leaderId !== userId) {
             return "You are not the Project Leader";
@@ -193,6 +196,26 @@ export const applicationService = {
             );
 
             return group;
+        });
+    },
+    async getCoordinatorApplications(coordinatorId: string) {
+        return prisma.projectApplication.findMany({
+            where: {
+                coordinatorId,
+                status: ApplicationStatus.PENDING_COORDINATOR
+            },
+            include: {
+                project: true,
+                leader: true,
+                members: {
+                    include: {
+                        user: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
         });
     }
 }

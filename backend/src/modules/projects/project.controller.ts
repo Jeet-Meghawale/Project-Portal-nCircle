@@ -32,7 +32,7 @@ export const projectController = {
         sendResponse(res, 200, projects, "Admin Project List");
     },
     async getProjectByIdAdmin(req: Request, res: Response) {
-        const projectId = req.validated?.params?.id;
+        const projectId = req.validated?.params?.projectId;
         const project = await projectService.getProjectByIdForAdmin(projectId);
 
         sendResponse(res, 200, project)
@@ -54,7 +54,7 @@ export const projectController = {
         sendResponse(res, 200, result);
     },
     async listVisible(req: Request, res: Response) {
-        const projectId = req.validated?.params?.id;
+        const projectId = req.validated?.params?.projectId;
         const result = await projectService.listVisible(projectId);
         if (result.status === 404) {
             return sendResponse(res, 404, null, "Project not found");

@@ -12,8 +12,12 @@ const app = express();
 app.use(helmet());
 
 // CORS
-app.use(cors());
-
+app.use(
+  cors({
+    origin: "http://localhost:3001", // ✅ exact frontend URL
+    credentials: true, // ✅ allow cookies
+  })
+);
 // JSON parser
 app.use(express.json());
 

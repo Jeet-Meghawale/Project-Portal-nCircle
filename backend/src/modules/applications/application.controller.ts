@@ -6,6 +6,11 @@ import { CreateApplicationDTO, CreateApplicationServiceInput } from "./applicati
 import { string } from "zod";
 
 export const applicationController = {
+    async getAdminApplications(req: Request, res: Response) {
+        const result = await applicationService.getAdminApplications();
+
+        sendResponse(res, 200, result, "Admin Applications");
+    },
     async getApplicationById(req: Request, res: Response) {
         const id = req.validated!.params!.applicationId;
         const result = await applicationService.getApplicationById(id);
@@ -31,9 +36,9 @@ export const applicationController = {
         }
         const result = await applicationService.createApplication(serviceInput);
         if (result === null) sendResponse(res, 500, {}, "Application creation failed");
-        if(typeof result === "string") sendResponse(res, 400, {}, result);
+        if (typeof result === "string") sendResponse(res, 400, {}, result);
         else
-        sendResponse(res, 200, result, "Application Created");
+            sendResponse(res, 200, result, "Application Created");
 
     },
     async verifyApplication(req: Request, res: Response) {
@@ -79,4 +84,12 @@ export const applicationController = {
         else
             sendResponse(res, 200, result, "Application updated")
     },
+    async getCoordinatorApplications(req: Request, res: Response) {
+        console.log("Controller: Fetching coordinator applications...");
+        const coordinatorId = req.userId!;
+
+        const result = await applicationService.getCoordinatorApplications(coordinatorId);
+
+        sendResponse(res, 200, result, "Coordinator Applications");
+    }
 }

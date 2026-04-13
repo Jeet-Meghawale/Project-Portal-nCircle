@@ -127,11 +127,22 @@ export const authController = {
         sendResponse(res, 200, updatedUser, "User updated successfully");
     },
     async verifyRoleController(req: Request, res: Response) {
+        console.log("VERIFY HIT:");
         const { email, role } = req.body;
-        const hasRole = await authService.verifyRole(email, role);
-        if (hasRole === "User not found") {
-            return sendResponse(res, 404, null, "User not found");
+        const user = await authService.verifyRole(email, role);
+
+        // ❌ INVALID → THROW ERROR
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found or not a student",
+            });
         }
-        sendResponse(res, 200, { hasRole }, "Role verified successfully");
-    },
+
+        // ✅ VALID → SUCCESS
+        return res.status(200).json({
+            success: true,
+            data: user,
+        });
+    }
 }
