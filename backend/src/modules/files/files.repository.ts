@@ -3,12 +3,12 @@ import { prisma } from "../../database/client";
 import { Prisma } from "@prisma/client";
 
 export const FilesRepository = {
-    createFile(data : Prisma.FileCreateInput) {
+    createFile(data: Prisma.FileCreateInput) {
         return prisma.file.create({
             data
         });
     },
-    deleteFile(id : string) {
+    deleteFile(id: string) {
         return prisma.file.delete({
             where: {
                 id
@@ -21,5 +21,12 @@ export const FilesRepository = {
                 id
             }
         });
-    }
+    },
+    getFilesForThread(threadId: string) {
+        return prisma.file.findMany({
+            where: {
+                threadId
+            }
+        });
+    },
 };

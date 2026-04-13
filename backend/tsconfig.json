@@ -3,7 +3,8 @@
     "rootDir": "./src",
     "outDir": "./dist",
 
-    "module": "CommonJS",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "target": "ES2021",
 
     "types": ["node"],
@@ -20,10 +21,8 @@
 
     "isolatedModules": true,
     "skipLibCheck": true,
-
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "moduleResolution": "node"
+    "resolveJsonModule": true
   },
 
   "include": ["src"],

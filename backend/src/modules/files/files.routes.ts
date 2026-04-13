@@ -4,7 +4,6 @@ import { upload } from "../../middlewares/uploads.middleware";
 import { validate } from "../../middlewares/zod.validator.middleware";
 import { threadIdParamSchema } from "../../validators/threads.validator";
 import { asyncHandler } from "../../utils/async.handler";
-import { file } from "zod";
 import { FilesController } from "./files.controller";
 import { fileIdParamSchema } from "../../validators/files.validator";
 
@@ -28,5 +27,11 @@ router.delete(
     asyncHandler(FilesController.deleteFile)
 )
 
+// get files for threadId
+router.get(
+    "/thread/:threadId",
+    validate({ params : threadIdParamSchema }),
+    asyncHandler(FilesController.getFilesForThread)
+)
 
 export default router;

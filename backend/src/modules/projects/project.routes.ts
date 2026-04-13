@@ -1,11 +1,12 @@
 import { Router } from "express";
 import { authorize } from "../../middlewares/rbac.middleware";
 import { validate } from "../../middlewares/zod.validator.middleware";
-import { createProjectSchema, ProjectIdParamSchema, updateProjectSchema } from "../../validators/project.validator";
+import { addTagsSchema, createProjectSchema, ProjectIdParamSchema, updateProjectSchema } from "../../validators/project.validator";
 import { projectController } from "./project.controller";
 import { Role } from "@prisma/client";
 import { asyncHandler } from "../../utils/async.handler";
 import { authMiddleware } from "../../middlewares/auth.middleware";
+import { upload } from "../../middlewares/uploads.middleware";
 
 const router = Router();
 
@@ -72,6 +73,54 @@ router.get(
 
     asyncHandler(projectController.listVisible)
 )
+
+// add tags to project
+router.post(
+    "/:projectId/tags",
+    validate({
+        params: ProjectIdParamSchema,
+        body: addTagsSchema
+    }),
+    asyncHandler(projectController.addTagsToProject)
+)
+
+// remove tags from project
+router.delete(
+    "/:projectId/tags",
+    validate({
+        params: ProjectIdParamSchema,
+        body: addTagsSchema
+    }),
+    asyncHandler(projectController.removeTagsFromProject)
+)
+
+
+// add file to projectId
+router.post(
+    "/:projectId/files",
+    validate({ params: ProjectIdParamSchema }),
+    authorize(Role.ADMIN),
+    upload.single("file"),
+    asyncHandler(projectController.addFileToProject)
+)
+
+// remove file from projectId
+router.delete(
+    "/:projectId/files/:fileId",
+    validate({
+        params: ProjectIdParamSchema
+    }),
+    authorize(Role.ADMIN),
+    asyncHandler(projectController.removeFileFromProject)
+)
+
+// get all files for projectId
+router.get(
+    "/:projectId/files",
+    validate({ params: ProjectIdParamSchema }),
+    asyncHandler(projectController.getFilesForProject)
+)
+
 
 // count of all Project
 

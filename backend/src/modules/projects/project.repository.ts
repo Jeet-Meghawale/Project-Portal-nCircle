@@ -79,5 +79,55 @@ export const projectRepository = {
                 }
             }
         });
+    },
+
+    addtagstoProject(projectId: string, tags: string[]) {
+        return prisma.project.update({
+            where: { id: projectId },
+            data: {
+                tags: {
+                    create: tags.map(tag => ({
+                        tag: {
+                            connectOrCreate: {
+                                where: { name: tag },
+                                create: { name: tag }
+                            }
+                        }
+                    }))
+                }
+            }
+        });
+    },
+    deletetagfromProject(projectId: string, tags: string[]) {
+        return prisma.project.update({
+            where: { id: projectId },
+            data: {
+                tags: {
+                    deleteMany: {
+                        tagName: { in: tags }
+                    }
+                }
+            }
+        });
+    },
+    createFile(data: any) {
+        return prisma.projectFiles.create({
+            data
+        });
+    },
+    deleteFile(fileId: string) {
+        return prisma.projectFiles.delete({
+            where: { id: fileId }
+        });
+    },
+    getFileById(fileId: string) {
+        return prisma.projectFiles.findUnique({
+            where: { id: fileId }
+        });
+    },
+    getFilesForProject(projectId: string) {
+        return prisma.projectFiles.findMany({
+            where: { projectId }
+        });
     }
 }

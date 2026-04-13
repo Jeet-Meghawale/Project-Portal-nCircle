@@ -52,5 +52,9 @@ export const filesService = {
         await deleteFromS3(key);
         // delete from database
         return FilesRepository.deleteFile(fileId);
-    }
+    },
+    async getFilesForThread(threadId: string) {
+        return FilesRepository.getFilesForThread(threadId);
+    },
+
 }

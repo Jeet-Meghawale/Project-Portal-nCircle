@@ -191,18 +191,9 @@ export const authService = {
     return authRepository.updateUser(userId, updateData);
   },
   async verifyRole(email: string, role: Role) {
-    const user = await prisma.user.findUnique({
-      where: { email },
-      select: {
-        id: true,
-        email: true,
-        role: true
-      }
-    });
-
-    if (!user) return null;
-    if (user.role !== role) return null;
-
-    return user;
+    return authRepository.verifyUserRole(email, role);
+  },
+  async getCoordinators() {
+    return authRepository.getCoordinators();
   }
 }

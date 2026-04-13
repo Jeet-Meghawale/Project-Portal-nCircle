@@ -32,11 +32,12 @@ export const applicationService = {
         return await applicationRepository.getApplicationById(id);
     },
     async createApplication(data: CreateApplicationServiceInput) {
-        const { leaderId, coordinatorId, projectId, members } = data;
+        const { leaderId, coordinatorId, projectId, members, proposed_solution } = data;
         const create = {
             leaderId,
             coordinatorId,
-            projectId
+            projectId,
+            proposed_solution
         }
         // remove duplicates
         const uniqueMembers = Array.from(
@@ -73,8 +74,12 @@ export const applicationService = {
                 status: ApplicationStatus.PENDING_ADMIN,
                 verifiedAt: new Date()
             };
-            return applicationRepository.updateApplication(id, data);
-
+            
+            const group = await this.handleVerify(application);
+            const updatedApplication = await applicationRepository.updateApplication(id, data);
+            return { application: updatedApplication,
+                group
+            };
         }
 
         if (application?.status === ApplicationStatus.PENDING_ADMIN || application?.status === ApplicationStatus.APPROVED) {
@@ -167,13 +172,6 @@ export const applicationService = {
                 applicationId: application.id
             });
 
-            const group = await groupService.createGroupTx(tx, {
-                projectId: application.projectId,
-                coordinatorId: application.coordinatorId,
-                applicationId: application.id,
-                members: dbMembers
-            });
-
             const workspaceMembers = [
                 ...dbMembers.map(m => ({
                     userId: m.userId,
@@ -184,6 +182,12 @@ export const applicationService = {
                     role: WorkspaceRole.COORDINATOR
                 }
             ];
+            const group = await groupService.getGroupByFilter(tx, {
+                applicationId: application.id
+            });
+            if(group===null){ // just for safety, this should not happen as group is created at verification step
+                throw new ApiError(500,"Group not found for approved application This should not happen as group is created at verification step");
+            }
 
             await workspaceService.createWorkspaceTx(
                 tx,
@@ -198,24 +202,18 @@ export const applicationService = {
             return group;
         });
     },
-    async getCoordinatorApplications(coordinatorId: string) {
-        return prisma.projectApplication.findMany({
-            where: {
-                coordinatorId,
-                status: ApplicationStatus.PENDING_COORDINATOR
-            },
-            include: {
-                project: true,
-                leader: true,
-                members: {
-                    include: {
-                        user: true
-                    }
-                }
-            },
-            orderBy: {
-                createdAt: "desc"
-            }
+
+    async handleVerify(application: ApprovedApplication) {
+        const { id : applicationId, projectId, coordinatorId} = application;
+        const dbMembers = await applicationRepository.getApplicationMembers(prisma, {
+            applicationId
         });
-    }
+        const group = await groupService.createGroupTx(prisma, {
+            projectId,
+            coordinatorId,
+            applicationId,
+            members: dbMembers
+        });
+        return group;
+    },
 }

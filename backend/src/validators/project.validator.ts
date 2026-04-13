@@ -18,3 +18,7 @@ export const updateProjectSchema = z.object({
 export const ProjectIdParamSchema = z.object({
   projectId: z.string().uuid()
 })
+
+export const addTagsSchema = z.object({
+  tags: z.array(z.string()).min(1)
+})

@@ -1,4 +1,3 @@
-import { ApplicationStatus } from "@prisma/client"
 import { z } from "zod"
 
 /*
@@ -8,6 +7,7 @@ Create application (Leader)
 export const createApplicationSchema = z.object({
   projectId: z.string().uuid(),
   coordinatorId : z.string().uuid(),
+  proposed_solution: z.string().max(400),
   members: z
     .array(
       z.object({

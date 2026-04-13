@@ -61,4 +61,9 @@ export const groupRepository = {
             }
         });
     },
+    getGroupByFilter(db: DB, filter: Prisma.GroupWhereInput) {
+        return db.group.findFirst({
+            where: filter
+        });
+    },
 };

@@ -9,6 +9,7 @@ Leader applies to a project
 export interface CreateApplicationDTO {
   projectId: string
   coordinatorId: string
+  proposed_solution: string
 
   members: {
     userId: string
@@ -47,6 +48,7 @@ export interface CreateApplicationServiceInput {
   leaderId: string
   projectId: string
   coordinatorId: string
+  proposed_solution: string
   members: {
     userId: string
     role: MemberRole

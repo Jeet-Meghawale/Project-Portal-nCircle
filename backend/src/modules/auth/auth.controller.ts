@@ -138,11 +138,10 @@ export const authController = {
                 message: "User not found or not a student",
             });
         }
-
-        // ✅ VALID → SUCCESS
-        return res.status(200).json({
-            success: true,
-            data: user,
-        });
-    }
+        sendResponse(res, 200, { hasRole }, "Role verified successfully");
+    },
+    async getCoordinatorsController(req: Request, res: Response) {
+        const coordinators = await authService.getCoordinators();
+        sendResponse(res, 200, coordinators, "Coordinators fetched successfully");
+    },
 }
