@@ -106,4 +106,9 @@ export const projectController = {
         const result = await projectService.getFilesForProject(projectId);
         sendResponse(res, 200, result, "Files retrieved successfully");
     },
+    async getMyProjects(req: Request, res: Response) {
+        const userId = req.userId!;
+        const projects = await projectService.getMyProjects(userId);
+        sendResponse(res, 200, projects, "My Projects retrieved successfully");
+    }
 };

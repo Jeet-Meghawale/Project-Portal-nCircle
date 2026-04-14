@@ -132,6 +132,9 @@ export const projectService = {
         }
         const files = await projectRepository.getFilesForProject(projectId);
         return { status: 200, data: files };
+    },
+    async getMyProjects(userId: string) {
+        return projectRepository.getProjectsForUser(userId);
     }
 
 }

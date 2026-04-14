@@ -12,7 +12,7 @@ export const validate =
       req.validated = req.validated || {};
 
       if (schema.body) {
-        const result = schema.body.safeParse(req.body);
+        const result = schema.body.safeParse(req.validated?.body);
         if (!result.success) {
           return res.status(400).json({ errors: result.error.flatten() });
         }
@@ -20,7 +20,7 @@ export const validate =
       }
 
       if (schema.params) {
-        const result = schema.params.safeParse(req.params);
+        const result = schema.params.safeParse(req.validated?.params);
         if (!result.success) {
           return res.status(400).json({ errors: result.error.flatten() });
         }
