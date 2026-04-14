@@ -10,7 +10,7 @@ export const projectController = {
 
         const project = await projectService.createProject(
             adminId,
-            req.body
+            req.validated!.body
         );
 
         res.status(201).json({
