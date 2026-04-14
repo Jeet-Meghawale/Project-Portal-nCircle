@@ -25,6 +25,29 @@ export const applicationRepository = {
             return application;
         });
     },
+    getAdminApplications() {
+        return prisma.projectApplication.findMany({
+            where: {
+                status: {
+                    in: ["PENDING_ADMIN", "PENDING_COORDINATOR"], // ✅ BOTH
+                },
+            },
+            orderBy: [
+                {
+                    status: "asc", // optional (we’ll control order better below)
+                },
+            ],
+            include: {
+                leader: true,
+                members: {
+                    include: {
+                        user: true,
+                    },
+                },
+                project: true,
+            },
+        });
+    },
     getApplicationById(id: string) {
         return prisma.projectApplication.findUnique({
             where: { id },

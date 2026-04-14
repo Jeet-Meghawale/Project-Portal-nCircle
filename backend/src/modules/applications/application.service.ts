@@ -25,6 +25,9 @@ const mapToWorkspaceRole = (role: MemberRole): WorkspaceRole => {
 
 
 export const applicationService = {
+    async getAdminApplications() {
+        return await applicationRepository.getAdminApplications();
+    },
     async getApplicationById(id: string) {
         return await applicationRepository.getApplicationById(id);
     },

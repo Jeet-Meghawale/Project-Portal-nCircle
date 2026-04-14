@@ -8,7 +8,7 @@ export const validate =
     query?: ZodSchema;
   }) =>
     (req: Request, res: Response, next: NextFunction) => {
-
+      console.log("hit");
       req.validated = req.validated || {};
 
       if (schema.body) {
