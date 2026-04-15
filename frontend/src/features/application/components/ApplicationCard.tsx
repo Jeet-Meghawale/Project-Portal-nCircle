@@ -36,6 +36,10 @@ const ApplicationCard = ({ application }: any) => {
           {application.status}
         </span>
       </div>
+      <div className="text-sm text-gray-400">
+        <p className="font-medium">Proposed Solution:</p>
+        <p>{application.proposed_solution}</p>
+      </div>
 
       {/* ACTIONS */}
       {["PENDING_COORDINATOR", "PENDING_ADMIN"].includes(application.status) && (

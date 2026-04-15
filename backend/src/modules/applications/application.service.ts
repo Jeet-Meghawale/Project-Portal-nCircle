@@ -37,7 +37,7 @@ export const applicationService = {
             leaderId,
             coordinatorId,
             projectId,
-            proposed_solution
+            proposed_solution 
         }
         // remove duplicates
         const uniqueMembers = Array.from(
@@ -74,10 +74,11 @@ export const applicationService = {
                 status: ApplicationStatus.PENDING_ADMIN,
                 verifiedAt: new Date()
             };
-            
+
             const group = await this.handleVerify(application);
             const updatedApplication = await applicationRepository.updateApplication(id, data);
-            return { application: updatedApplication,
+            return {
+                application: updatedApplication,
                 group
             };
         }
@@ -185,8 +186,8 @@ export const applicationService = {
             const group = await groupService.getGroupByFilter(tx, {
                 applicationId: application.id
             });
-            if(group===null){ // just for safety, this should not happen as group is created at verification step
-                throw new ApiError(500,"Group not found for approved application This should not happen as group is created at verification step");
+            if (group === null) { // just for safety, this should not happen as group is created at verification step
+                throw new ApiError(500, "Group not found for approved application This should not happen as group is created at verification step");
             }
 
             await workspaceService.createWorkspaceTx(
@@ -204,7 +205,7 @@ export const applicationService = {
     },
 
     async handleVerify(application: ApprovedApplication) {
-        const { id : applicationId, projectId, coordinatorId} = application;
+        const { id: applicationId, projectId, coordinatorId } = application;
         const dbMembers = await applicationRepository.getApplicationMembers(prisma, {
             applicationId
         });
@@ -216,4 +217,7 @@ export const applicationService = {
         });
         return group;
     },
+    async getCoordinatorApplications(coordinatorId: string) {
+        return await applicationRepository.getCoordinatorApplications(coordinatorId);
+    }
 }

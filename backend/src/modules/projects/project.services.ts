@@ -47,6 +47,15 @@ export const projectService = {
             isActive: true
         });
     },
+    async getStudentProjects(userId: string) {
+        const memberships = await projectRepository.getStudentProjects(userId);
+
+        return memberships.map((item: any) => ({
+            groupId: item.group.id,
+            project: item.group.project,
+            workspaceId: item.group.workspace?.id
+        }));
+    },
     async getProject(id: string) {
         return projectRepository.getProjectbyId(id);
     },

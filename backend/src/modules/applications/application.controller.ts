@@ -18,6 +18,7 @@ export const applicationController = {
         sendResponse(res, 200, result);
     },
     async createApplication(req: Request, res: Response) {
+        console.log("Controller: Creating application...");
         const leaderId = req.userId as string;
         const body: CreateApplicationDTO = req.validated!.body;
 
@@ -32,7 +33,7 @@ export const applicationController = {
             leaderId,
             coordinatorId: body.coordinatorId,
             projectId: body.projectId,
-            proposed_solution: body.proposed_solution,
+            proposed_solution: body.proposed_solution || "",
             members
         }
         const result = await applicationService.createApplication(serviceInput);

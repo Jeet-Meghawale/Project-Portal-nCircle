@@ -74,7 +74,7 @@ router.patch(
 //Reject application
 router.patch(
     "/reject/:applicationId",
-    authorize(Role.ADMIN),
+    authorize(Role.ADMIN, Role.COORDINATOR),
     validate({ params: applicationIdParamSchema }),
     asyncHandler(applicationController.rejectApplication)
 );

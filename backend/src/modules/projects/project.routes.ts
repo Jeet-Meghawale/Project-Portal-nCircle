@@ -26,7 +26,11 @@ router.get(
     asyncHandler(projectController.listProjects)
 )
 
-
+router.get(
+  "/my-projects",
+  authorize(Role.STUDENT),
+  asyncHandler(projectController.getStudentProjects)
+);
 // create Project
 router.post(
     "/create",

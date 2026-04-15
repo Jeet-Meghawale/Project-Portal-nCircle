@@ -80,7 +80,21 @@ export const projectRepository = {
             }
         });
     },
-
+    getStudentProjects(userId: string) {
+        return prisma.groupMember.findMany({
+            where: {
+                userId
+            },
+            include: {
+                group: {
+                    include: {
+                        project: true,
+                        workspace: true
+                    }
+                }
+            }
+        });
+    },
     addtagstoProject(projectId: string, tags: string[]) {
         return prisma.project.update({
             where: { id: projectId },

@@ -22,6 +22,7 @@ export interface CreateApplicationOnly{
   leaderId:string
   projectId: string
   coordinatorId: string
+  proposed_solution: string
 }
 
 /*

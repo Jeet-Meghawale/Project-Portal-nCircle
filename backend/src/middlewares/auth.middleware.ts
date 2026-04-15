@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "../utils/jwt.util";
-import { ApiError } from "../utils/api.error";
 import { prisma } from "../database/client";
+import { sendResponse } from "../utils/send.response";
 
 
 export const authMiddleware=async (
@@ -11,12 +11,15 @@ export const authMiddleware=async (
 ) => {
     const authHeader = req.headers.authorization;
     if(!authHeader){
-        throw new ApiError(401 , "Authorization Header Missing");
+        sendResponse(res, 401,null, "Authorization Header Missing");
+        return;
     }
     const parts = authHeader.split(" ");
     if(parts.length!==2 || parts[0]!=="Bearer"){
-        throw new ApiError(401 , "Invalid Authorization format");
+        sendResponse(res, 401,null, "Invalid Authorization format");
+        return;
     }
+    
     const token  = parts[1]!;
     try{
         const decoded=verifyAccessToken(token ) as {userId:string};
@@ -29,6 +32,6 @@ export const authMiddleware=async (
         next();
     }
     catch(err){
-        throw new ApiError(401 , "Invalid or expired token");
+        sendResponse(res, 401,null, "Invalid or expired token");
     }
 };

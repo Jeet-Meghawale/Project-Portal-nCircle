@@ -1,48 +1,27 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { useCreateApplication } from "../hooks/useCreateApplication";
+import { useCoordinators } from "../hooks/useCoordinators";
 import { applicationService } from "../api/applicationService";
 
-interface Props {
-  isOpen: boolean;
-  onClose: () => void;
-  project: any;
-  user: any;
-}
-
-type Member = {
-  email: string;
-  verified: boolean;
-  userId?: string;
-};
-
-const ApplyProjectModal = ({ isOpen, onClose, project, user }: Props) => {
-  const defaultCoordinatorId = "7e30e22c-3043-40e1-8dab-14842e06bc18";
+const ApplyProjectModal = ({ isOpen, onClose, project, user }: any) => {
   const { mutate, isPending } = useCreateApplication();
+  const { data: coordinators = [] } = useCoordinators();
 
   const [email, setEmail] = useState("");
-  const [members, setMembers] = useState<Member[]>([]);
+  const [members, setMembers] = useState<any[]>([]);
   const [selectedCoordinator, setSelectedCoordinator] = useState("");
+  const [proposedSolution, setProposedSolution] = useState("");
   const [error, setError] = useState("");
 
   if (!isOpen) return null;
 
-  // ✅ Add member
+  // ADD MEMBER
   const handleAddMember = () => {
     if (!email) return;
 
-    const last = members[members.length - 1];
-
-    if (last && !last.verified) {
-      return setError("Verify previous member first");
-    }
-
     if (members.find((m) => m.email === email)) {
       return setError("Member already added");
-    }
-
-    if (members.length >= 6) {
-      return setError("Max 6 members allowed");
     }
 
     setMembers([...members, { email, verified: false }]);
@@ -50,52 +29,48 @@ const ApplyProjectModal = ({ isOpen, onClose, project, user }: Props) => {
     setError("");
   };
 
-  // ✅ VERIFY (FINAL)
+  // VERIFY
   const handleVerify = async (index: number) => {
     try {
       const member = members[index];
-      console.log("Verifying:", member.email);
+
       const res = await applicationService.verifyUser(member.email);
 
       const updated = [...members];
-
       updated[index] = {
         ...member,
         verified: true,
-        userId: res.id, // ✅ IMPORTANT
+        userId: res.id, // ✅ NOW WORKS
       };
 
       setMembers(updated);
-      setError("");
-
     } catch (err: any) {
       setError(err?.response?.data?.message || "Verification failed");
     }
   };
 
+  // REMOVE
+  const handleRemove = (index: number) => {
+    setMembers(members.filter((_, i) => i !== index));
+  };
+
   const allVerified = members.every((m) => m.verified);
 
-  // ✅ SUBMIT (FINAL)
+  // SUBMIT
   const handleSubmit = () => {
-    const coordinatorId = selectedCoordinator || defaultCoordinatorId;
-    if (!coordinatorId) {
-      setError("Select coordinator");
-      return;
-    }
-
-    if (!allVerified) {
-      setError("Verify all members first");
-      return;
-    }
+    if (!selectedCoordinator) return setError("Select coordinator");
+    if (!proposedSolution.trim()) return setError("Solution required");
+    if (!allVerified) return setError("Verify members first");
 
     const formattedMembers = members.map((m) => ({
-      userId: m.userId!, // ✅ REAL ID
+      userId: m.userId,
       role: "MEMBER" as const,
     }));
 
     mutate({
       projectId: project.id,
-      coordinatorId: defaultCoordinatorId, // ✅ FIXED FOR TESTING
+      coordinatorId: selectedCoordinator,
+      proposed_solution: proposedSolution,
       members: formattedMembers,
     });
 
@@ -103,86 +78,89 @@ const ApplyProjectModal = ({ isOpen, onClose, project, user }: Props) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-[#0B0F1A] w-full max-w-2xl rounded-xl p-6 space-y-5 relative">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-4">
+      <div className="bg-[#0B0F1A] w-full max-w-2xl rounded-xl flex flex-col max-h-[90vh]">
 
-        {/* Close */}
-        <button onClick={onClose} className="absolute top-4 right-4">
-          <X />
-        </button>
-
-        <h2 className="text-lg font-semibold">Apply for Project</h2>
-
-        {/* Leader */}
-        <input
-          value={user?.email || ""}
-          disabled
-          className="w-full bg-[#020817] p-2 rounded"
-        />
-
-        {/* Members */}
-        <div>
-          <div className="flex gap-2">
-            <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Member email"
-              className="flex-1 bg-[#020817] p-2 rounded"
-            />
-
-            <button onClick={handleAddMember} className="bg-green-600 px-3">
-              Add
-            </button>
-          </div>
-
-          {error && <p className="text-red-500 text-xs">{error}</p>}
-
-          {members.map((m, i) => (
-            <div key={i} className="flex justify-between mt-2 items-center">
-              <span>{m.email}</span>
-
-              {!m.verified ? (
-                <button
-                  onClick={() => handleVerify(i)}
-                  className="bg-blue-600 px-3 py-1 rounded text-sm"
-                >
-                  Verify
-                </button>
-              ) : (
-                <span className="text-green-500 text-sm">Verified ✓</span>
-              )}
-            </div>
-          ))}
+        {/* HEADER */}
+        <div className="flex justify-between items-center p-5 border-b border-gray-800">
+          <h2>Apply for Project</h2>
+          <button onClick={onClose}>
+            <X />
+          </button>
         </div>
 
-        {/* Coordinator */}
-        <select
-          value={selectedCoordinator}
-          onChange={(e) => setSelectedCoordinator(e.target.value)}
-          className="w-full bg-[#020817] p-2 rounded"
-        >
-          <option value="">Select Coordinator</option>
+        {/* BODY */}
+        <div className="p-5 space-y-5 overflow-y-auto">
 
-          {project.mentors?.map((m: any) => (
-            <option key={m.id} value={m.id}>
-              {m.name}
-            </option>
-          ))}
-        </select>
+          {/* LEADER */}
+          <input value={user?.email} disabled className="w-full p-2 bg-[#020817]" />
 
-        {/* Actions */}
-        <div className="flex justify-end gap-2">
+          {/* MEMBERS */}
+          <div>
+            <div className="flex gap-2">
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Member email"
+                className="flex-1 p-2 bg-[#020817]"
+              />
+              <button onClick={handleAddMember} className="bg-green-600 px-3">
+                Add
+              </button>
+            </div>
+
+            {members.map((m, i) => (
+              <div key={i} className="flex justify-between mt-2">
+                <span>{m.email}</span>
+
+                <div className="flex gap-2">
+                  {!m.verified && (
+                    <button onClick={() => handleVerify(i)}>Verify</button>
+                  )}
+
+                  <button onClick={() => handleRemove(i)}>Remove</button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* SOLUTION */}
+          <textarea
+            value={proposedSolution}
+            onChange={(e) => setProposedSolution(e.target.value)}
+            placeholder="Proposed Solution"
+            className="w-full p-2 bg-[#020817]"
+          />
+
+          {/* COORDINATOR */}
+          <select
+            value={selectedCoordinator}
+            onChange={(e) => setSelectedCoordinator(e.target.value)}
+            className="w-full p-2 bg-[#020817]"
+          >
+            <option value="">Select Coordinator</option>
+            {coordinators.map((c: any) => (
+              <option key={c.id} value={c.id}>
+                {c.firstName} {c.lastName}
+              </option>
+            ))}
+          </select>
+
+          {error && <p className="text-red-500">{error}</p>}
+        </div>
+
+        {/* FOOTER */}
+        <div className="p-4 flex justify-end gap-2">
           <button onClick={onClose}>Cancel</button>
 
           <button
             onClick={handleSubmit}
-            disabled={ !allVerified || isPending}
-            className="bg-green-600 px-4 py-2 rounded text-black"
+            disabled={!selectedCoordinator || !allVerified || isPending}
+            className="bg-green-600 px-4 py-2"
           >
-            {isPending ? "Submitting..." : "Submit"}
+            Submit
           </button>
         </div>
-
       </div>
     </div>
   );

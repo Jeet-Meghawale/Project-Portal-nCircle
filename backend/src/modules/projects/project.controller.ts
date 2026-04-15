@@ -31,6 +31,13 @@ export const projectController = {
         const projects = await projectService.listProjectsAdmin();
         sendResponse(res, 200, projects, "Admin Project List");
     },
+    async getStudentProjects(req: Request, res: Response) {
+        const userId = req.userId!;
+
+        const projects = await projectService.getStudentProjects(userId);
+
+        sendResponse(res, 200, projects, "Student Projects fetched");
+    },
     async getProjectByIdAdmin(req: Request, res: Response) {
         const projectId = req.validated?.params?.projectId;
         const project = await projectService.getProjectByIdForAdmin(projectId);

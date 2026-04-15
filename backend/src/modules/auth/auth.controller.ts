@@ -138,7 +138,12 @@ export const authController = {
                 message: "User not found or not a student",
             });
         }
-        sendResponse(res, 200, { hasRole }, "Role verified successfully");
+        // ✅ VALID → RETURN USER
+        return res.status(200).json({
+            success: true,
+            data: user,
+            message: "User verified successfully",
+        });
     },
     async getCoordinatorsController(req: Request, res: Response) {
         const coordinators = await authService.getCoordinators();

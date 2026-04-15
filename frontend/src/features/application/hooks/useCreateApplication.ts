@@ -15,14 +15,6 @@ export const useCreateApplication = () => {
       queryClient.invalidateQueries({
         queryKey: ["student-dashboard"],
       });
-
-      queryClient.invalidateQueries({
-        queryKey: ["applications"],
-      });
-    },
-
-    onError: (error: any) => {
-      console.error("Application failed:", error?.response?.data || error);
     },
   });
 };

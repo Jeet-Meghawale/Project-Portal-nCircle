@@ -1,85 +1,58 @@
 import apiClient from "../../../shared/lib/apiClient";
 
 export const applicationService = {
-  // =========================================
-  // 🔹 STUDENT
-  // =========================================
-
+  // ✅ CREATE APPLICATION
   createApplication: async (data: {
     projectId: string;
     coordinatorId: string;
+    proposed_solution: string;
     members: { userId: string; role: "MEMBER" }[];
   }) => {
     const res = await apiClient.post("/application/create", data);
     return res.data.data;
   },
 
-  // Verify member (email → userId)
+  // ✅ VERIFY USER (FIXED)
   verifyUser: async (email: string) => {
     const res = await apiClient.post("/auth/verify-role", {
       email,
       role: "STUDENT",
     });
 
-    return res.data.data; // { id, email, role }
+    return res.data.data; // 🔥 returns { id, email, role }
   },
 
-  getMyApplications: async () => {
-    const res = await apiClient.get("/application/my");
-    return res.data.data;
-  },
-
-  cancelApplication: async (applicationId: string) => {
-    const res = await apiClient.patch(`/application/cancel/${applicationId}`);
-    return res.data.data;
-  },
-
-  // =========================================
-  // 🔹 COORDINATOR
-  // =========================================
-
-
+  // ✅ COORDINATOR APPLICATIONS
   getCoordinatorApplications: async () => {
-    console.log("Fetching coordinator applications...");
     const res = await apiClient.get("/application/coordinator");
-    console.log(res.data);
     return res.data.data;
   },
 
-  // Move → PENDING_ADMIN
+  getCoordinators: async () => {
+    const res = await apiClient.get("/auth/coordinators");
+    return res.data.data;
+  },
+  // ✅ VERIFY (COORDINATOR)
   verifyApplication: async (applicationId: string) => {
     const res = await apiClient.patch(`/application/verify/${applicationId}`);
     return res.data.data;
   },
 
-  // =========================================
-  // 🔹 ADMIN
-  // =========================================
-
-  // Fetch applications verified by coordinator
+  // ✅ ADMIN APPLICATIONS
   getAdminApplications: async () => {
     const res = await apiClient.get("/application/admin");
-    console.log("Admin applications:", res.data);
     return res.data.data;
   },
 
-  // Final approval → creates group
+  // ✅ FINAL APPROVE
   approveApplication: async (applicationId: string) => {
     const res = await apiClient.patch(`/application/approve/${applicationId}`);
     return res.data.data;
   },
 
+  // ✅ REJECT
   rejectApplication: async (applicationId: string) => {
     const res = await apiClient.patch(`/application/reject/${applicationId}`);
-    return res.data.data;
-  },
-
-  // =========================================
-  // 🔹 COMMON
-  // =========================================
-
-  getApplicationById: async (applicationId: string) => {
-    const res = await apiClient.get(`/application/${applicationId}`);
     return res.data.data;
   },
 };

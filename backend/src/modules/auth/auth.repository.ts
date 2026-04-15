@@ -84,10 +84,16 @@ export const authRepository = {
     const user = await prisma.user.findUnique({
       where: { email }
     });
-    if (!user) {
-      return "User not found";
-    }
-    return user?.role === role;
+
+    if (!user) return null;
+
+    if (user.role !== role) return null;
+
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    };
   },
   async getCoordinators() {
     return prisma.user.findMany({

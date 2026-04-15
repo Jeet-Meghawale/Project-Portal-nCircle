@@ -4,48 +4,34 @@ import { applicationService } from "../../application/api/applicationService";
 export const useApproveApplication = () => {
   const queryClient = useQueryClient();
 
-  // 🔹 Coordinator → verify
   const verifyMutation = useMutation({
-    mutationFn: (applicationId: string) =>
-      applicationService.verifyApplication(applicationId),
-
+    mutationFn: applicationService.verifyApplication,
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["coordinator-applications"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["coordinator-applications"] });
     },
   });
 
-  // 🔹 Admin → final approve
   const approveMutation = useMutation({
-    mutationFn: (applicationId: string) =>
-      applicationService.approveApplication(applicationId),
-
+    mutationFn: applicationService.approveApplication,
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["admin-applications"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["admin-applications"] });
     },
   });
 
-  // 🔹 Reject (common)
   const rejectMutation = useMutation({
-    mutationFn: (applicationId: string) =>
-      applicationService.rejectApplication(applicationId),
-
+    mutationFn: applicationService.rejectApplication,
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["coordinator-applications"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["admin-applications"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["coordinator-applications"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-applications"] });
+    },
+    onError: (err: any) => {
+      alert(err?.response?.data?.message || "Reject failed");
     },
   });
 
   return {
-    verify: verifyMutation.mutate,   // coordinator
-    approve: approveMutation.mutate, // admin
+    verify: verifyMutation.mutate,
+    approve: approveMutation.mutate,
     reject: rejectMutation.mutate,
 
     isVerifying: verifyMutation.isPending,

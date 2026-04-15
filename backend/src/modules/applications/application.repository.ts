@@ -90,6 +90,26 @@ export const applicationRepository = {
             }
         });
     },
+    getCoordinatorApplications(coordinatorId: string) {
+        return prisma.projectApplication.findMany({
+            where: {
+                coordinatorId,
+                status: "PENDING_COORDINATOR", // 🔥 important
+            },
+            include: {
+                leader: true,
+                members: {
+                    include: {
+                        user: true,
+                    },
+                },
+                project: true,
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+        });
+    }
 }
 
 
