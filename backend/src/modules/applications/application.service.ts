@@ -37,7 +37,7 @@ export const applicationService = {
             leaderId,
             coordinatorId,
             projectId,
-            proposed_solution 
+            proposed_solution
         }
         // remove duplicates
         const uniqueMembers = Array.from(
@@ -104,10 +104,12 @@ export const applicationService = {
             const data = {
                 status: ApplicationStatus.APPROVED,
                 approvedAt: new Date(),
-                approvedBy: userId,
+                approvedBy: {
+                    connect: { id: userId }
+                },
                 isApproved: true
             }
-            this.handleApproval(application);
+            await this.handleApproval(application);
             return applicationRepository.updateApplication(id, data);
         }
 
@@ -195,7 +197,6 @@ export const applicationService = {
                 {
                     groupId: group.id,
                     projectId: application.projectId,
-                    coordinatorId: application.coordinatorId,
                 },
                 workspaceMembers
             );

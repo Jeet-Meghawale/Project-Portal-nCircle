@@ -38,7 +38,6 @@ export const workspaceService = {
         data: {
             groupId: string;
             projectId: string;
-            coordinatorId: string;
         },
         members: { userId: string; role: WorkspaceRole }[]
     ) {
