@@ -143,5 +143,25 @@ export const projectRepository = {
         return prisma.projectFiles.findMany({
             where: { projectId }
         });
-    }
-}
+    },
+    getProjectsForUser(userId: string) {
+        return prisma.project.findMany({
+            where: {
+                OR: [
+                    { createdBy: userId },
+                    {
+                        applications: {
+                            some: {
+                                OR: [
+                                    { leaderId: userId },
+                                    { members: { some: { userId } } }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            orderBy: { createdAt: "desc" }
+        });
+    },
+};

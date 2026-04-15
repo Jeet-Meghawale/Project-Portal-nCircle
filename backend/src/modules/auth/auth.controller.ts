@@ -120,7 +120,7 @@ export const authController = {
         sendResponse(res, 201, null, "Users registered successfully");
     },
     async updateUserController(req: Request, res: Response) {
-        const userId = req.params.id as string;
+        const userId = req.validated?.params.id as string;
         const updateData = req.body;
 
         const updatedUser = await authService.updateUser(userId, updateData);

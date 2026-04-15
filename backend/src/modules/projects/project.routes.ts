@@ -125,7 +125,11 @@ router.get(
     asyncHandler(projectController.getFilesForProject)
 )
 
-
+// get my projects
+router.get(
+    "/my",
+    asyncHandler(projectController.getMyProjects)
+)
 // count of all Project
 
 // count of listed Projects
